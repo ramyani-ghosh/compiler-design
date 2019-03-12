@@ -1,10 +1,9 @@
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF TYPE_NAME
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP H
-%token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN 
+%token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN
+%token CHAR SHORT INT LONG FLOAT DOUBLE VOID
 
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE VOID
-
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
+%token IF ELSE  CONTINUE BREAK RETURN
 %token HASH INCLUDE LIBRARY
 
 %start hashinclude
@@ -38,7 +37,7 @@ unary_expression
 	| DEC_OP unary_expression
 	| unary_operator cast_expression
 	| SIZEOF unary_expression
-	| SIZEOF '(' type_name ')'
+	| SIZEOF '(' type_specifier ')'
 	;
 
 unary_operator
@@ -52,7 +51,7 @@ unary_operator
 
 cast_expression
 	: unary_expression
-	| '(' type_name ')' cast_expression
+	| '(' type_specifier ')' cast_expression
 	;
 
 multiplicative_expression
@@ -68,8 +67,6 @@ additive_expression
 	| additive_expression '-' multiplicative_expression
 	;
 
-
-
 relational_expression
 	: additive_expression
 	| relational_expression '<' additive_expression
@@ -84,24 +81,9 @@ equality_expression
 	| equality_expression NE_OP relational_expression
 	;
 
-and_expression
-	: equality_expression
-	| and_expression '&' equality_expression
-	;
-
-exclusive_or_expression
-	: and_expression
-	| exclusive_or_expression '^' and_expression
-	;
-
-inclusive_or_expression
-	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
-	;
-
 logical_and_expression
-	: inclusive_or_expression
-	| logical_and_expression AND_OP inclusive_or_expression
+	: equality_expression
+	| logical_and_expression AND_OP equality_expression
 	;
 
 logical_or_expression
@@ -126,7 +108,7 @@ assignment_operator
 	| MOD_ASSIGN
 	| ADD_ASSIGN
 	| SUB_ASSIGN
-	
+
 	;
 
 expression
@@ -134,20 +116,12 @@ expression
 	| expression ',' assignment_expression
 	;
 
-constant_expression
-	: conditional_expression
-	;
 
 declaration
-	: declaration_specifiers ';'
-	| declaration_specifiers init_declarator_list ';'
+	: type_specifier init_declarator_list ';'
 	;
 
-declaration_specifiers
-	: type_specifier
-	| type_specifier declaration_specifiers
 
-	;
 
 init_declarator_list
 	: init_declarator
@@ -168,37 +142,15 @@ type_specifier
 	| LONG
 	| FLOAT
 	| DOUBLE
-	| SIGNED
-	| UNSIGNED
-	| TYPE_NAME
-	;
-
-
-specifier_qualifier_list
-	: type_specifier specifier_qualifier_list
-	| type_specifier
 	;
 
 declarator
-	: direct_declarator
-	;
-
-direct_declarator
 	: IDENTIFIER
-	| '(' declarator ')'
-	| direct_declarator '[' constant_expression ']'
-	| direct_declarator '[' ']'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' identifier_list ')'
-	| direct_declarator '(' ')'
-	;
-
-
-
-
-
-parameter_type_list
-	: parameter_list
+	/* | '(' declarator ')' */
+	| declarator '[' ']'
+	| declarator '(' parameter_list ')'
+	| declarator '(' identifier_list ')'
+	| declarator '(' ')'
 	;
 
 parameter_list
@@ -207,8 +159,8 @@ parameter_list
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator
-	| declaration_specifiers
+	: type_specifier declarator
+	| type_specifier
 	;
 
 identifier_list
@@ -216,9 +168,6 @@ identifier_list
 	| identifier_list ',' IDENTIFIER
 	;
 
-type_name
-	: specifier_qualifier_list
-    ;
 
 initializer
 	: assignment_expression
@@ -232,19 +181,12 @@ initializer_list
 	;
 
 statement
-	: labeled_statement
-	| compound_statement
+	: compound_statement
 	| expression_statement
 	| selection_statement
-	| iteration_statement
 	| jump_statement
 	;
 
-labeled_statement
-	: IDENTIFIER ':' statement
-	| CASE constant_expression ':' statement
-	| DEFAULT ':' statement
-	;
 
 compound_statement
 	: '{' '}'
@@ -271,15 +213,8 @@ expression_statement
 selection_statement
 	: IF '(' expression ')' statement
 	| IF '(' expression ')' statement ELSE statement
-	| SWITCH '(' expression ')' statement
 	;
 
-iteration_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' expression_statement expression_statement ')' statement
-	| FOR '(' expression_statement expression_statement expression ')' statement
-	;
 
 jump_statement
 	: CONTINUE ';'
@@ -304,8 +239,8 @@ external_declaration
 	;
 
 function_definition
-	: declaration_specifiers declarator declaration_list compound_statement
-	| declaration_specifiers declarator compound_statement
+	: type_specifier declarator declaration_list compound_statement
+	| type_specifier declarator compound_statement
 	| declarator declaration_list compound_statement
 	| declarator compound_statement
 	;

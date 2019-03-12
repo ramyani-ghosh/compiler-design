@@ -14,28 +14,21 @@ void count();
 
 %%
 "/*"			{ comment(); }
+"//"		{ scomment(); }
 
 "break"			{ count(); return(BREAK); }
-"case"			{ count(); return(CASE); }
 "char"			{ count(); return(CHAR); }
 "continue"		{ count(); return(CONTINUE); }
-"default"		{ count(); return(DEFAULT); }
-"do"			{ count(); return(DO); }
 "double"		{ count(); return(DOUBLE); }
 "else"			{ count(); return(ELSE); }
 "float"			{ count(); return(FLOAT); }
-"for"			{ count(); return(FOR); }
 "if"			{ count(); return(IF); }
 "int"			{ count(); return(INT); }
 "long"			{ count(); return(LONG); }
 "return"		{ count(); return(RETURN); }
 "short"			{ count(); return(SHORT); }
-"signed"		{ count(); return(SIGNED); }
 "sizeof"		{ count(); return(SIZEOF); }
-"switch"		{ count(); return(SWITCH); }
-"unsigned"		{ count(); return(UNSIGNED); }
 "void"			{ count(); return(VOID); }
-"while"			{ count(); return(WHILE); }
 "include"		{count(); return(INCLUDE);}
 "h"				{count(); return(H);}
 
@@ -108,18 +101,26 @@ comment()
 
 loop:
 	while ((c = input()) != '*' && c != 0)
-		putchar(c);
+		continue;
 
 	if ((c1 = input()) != '/' && c != 0)
 	{
-		unput(c1);
+		/* unput(c1); */
 		goto loop;
 	}
 
-	if (c != 0)
-		putchar(c1);
 }
 
+scomment()
+{
+	char c, c1;
+	while((c=input()) !='\n'  && c!=0)
+		continue;
+		/* putchar(c); */
+	if(c!=0)
+		putchar('\n');
+
+}
 
 int column = 0;
 
