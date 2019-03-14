@@ -139,4 +139,4 @@ void symtab_dump(FILE * of) {
       }
     }
   }
-} 
+}

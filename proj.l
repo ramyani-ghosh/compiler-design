@@ -7,9 +7,13 @@ IS			(u|U|l|L)*
 
 %{
 #include <stdio.h>
+#include<string.h>
 #include "y.tab.h"
 
 void count();
+void comment();
+void scomment();
+int check_type();
 %}
 
 %%
@@ -95,7 +99,7 @@ yywrap()
 }
 
 
-comment()
+void comment()
 {
 	char c, c1;
 
@@ -111,7 +115,7 @@ loop:
 
 }
 
-scomment()
+void scomment()
 {
 	char c, c1;
 	while((c=input()) !='\n'  && c!=0)
@@ -126,8 +130,8 @@ int column = 0;
 
 void count()
 {
+	strcpy(yylval.string,yytext);
 	int i;
-
 	for (i = 0; yytext[i] != '\0'; i++)
 		if (yytext[i] == '\n')
 			column = 0;
@@ -153,7 +157,7 @@ int check_type()
 /*
 *	it actually will only return IDENTIFIER
 */
-
+	/* printf("IDENTIFIER"); */
 	return(IDENTIFIER);
 }
 /*
