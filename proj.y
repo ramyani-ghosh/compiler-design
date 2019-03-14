@@ -21,10 +21,13 @@ symbol_table *st = NULL;
 int lookup(char *s, char *type, char*);
 symbol_table* initialize();
 void insert(char *s, char *type, char*);
+void check_scope(char *s, char *type, char *token_type);
 
 extern char yytext[];
 extern int column;
 extern FILE *yyin;
+int scope_error= 0;
+char *wrong_symbol;
 
 
 %}
@@ -219,7 +222,7 @@ initializer_list
 	;
 
 statement
-	: {curr_scope++; printf("HERE");}  compound_statement {curr_scope--;}
+	: {curr_scope++; }  compound_statement {curr_scope--;}
 	| expression_statement	{}
 	| selection_statement	{}
 	| jump_statement		{}
@@ -249,7 +252,8 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement statement	{}
+	: IF '(' expression ')' statement 	{}
+	| IF '(' expression ')' statement  declaration_list	{}
 	| IF '(' expression ')' statement ELSE statement statement {}
 	;
 
@@ -302,24 +306,50 @@ symbol_table* initialize()
 
 int lookup(char *s, char *type, char *token_type)
 {
+		check_scope(s,type,token_type);
 	if(st == NULL)
 	{
+
 		insert(s, type, token_type);
 		return 0;
 	}
 	symbol_table *temp = st;
 	while(st!=NULL)
 	{
-		if(strcmp(st->name, s)==0)
+		if(strcmp(st->name, s)==0&&strcmp(st->type,type)==0)
 		{
-			return 1;
+	  	check_scope(s,type,token_type);
+			return 0;
 		}
 		st = st->next;
 	}
 	st = temp;
+//  check_scope(s,type,token_type);
 	insert(s, type, token_type);
+
 	return 0;
 }
+
+void check_scope(char *s, char *type, char *token_type)
+{
+
+	//printf("\nscope error %s= %d", s,scope_error);
+  wrong_symbol=(char*)malloc(128*sizeof(char));
+	symbol_table *temp = st;
+	while(temp!=NULL)
+	{
+		if(strcmp(temp->name, s)==0&&temp->scope==curr_scope)
+		{
+			strcpy(wrong_symbol, temp->name);
+			scope_error=1;
+			printf("\n%*s\n%*s   <--- already declared in current scope \n", column, "^", column, wrong_symbol);
+			exit(0);
+		}
+		temp = temp->next;
+	}
+
+}
+
 void insert(char *s, char *type, char* token_type)
 {
 	symbol_table *new_entry;
@@ -360,12 +390,14 @@ void display()
 }
 
 
-
 yyerror(s)
 char *s;
 {
 	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
+
+		printf("\n%*s\n%*s\n", column, "^", column, s);
+
+
 }
 
 int main()
