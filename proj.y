@@ -276,8 +276,8 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement 	{}
-	| IF '(' expression ')' statement  declaration_list	{}
+	: IF '(' expression ')' statement statement{}
+	| IF '(' expression ')' statement  declaration_list	statement{}
 	| IF '(' expression ')' statement ELSE statement statement {}
 	;
 
