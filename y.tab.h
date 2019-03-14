@@ -120,7 +120,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 47 "proj.y" /* yacc.c:1909  */
+#line 49 "proj.y" /* yacc.c:1909  */
 
 	int ival;
 	char string[128];

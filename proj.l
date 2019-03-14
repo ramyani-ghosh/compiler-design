@@ -13,7 +13,10 @@ IS			(u|U|l|L)*
 void count();
 void comment();
 void scomment();
+void new_line();
 int check_type();
+
+int line_number=1;
 %}
 
 %%
@@ -87,7 +90,7 @@ L?\"(\\.|[^\\"])*\"	{ count(); return(STRING_LITERAL); }
 "^"			{ count(); return('^'); }
 "|"			{ count(); return('|'); }
 "?"			{ count(); return('?'); }
-
+"\n"		{ count(); new_line(); }
 [ \t\v\n\f]		{ count(); }
 .			{ /* ignore bad characters */ }
 
@@ -98,7 +101,10 @@ yywrap()
 	return(1);
 }
 
-
+void new_line()
+{
+	line_number++;
+}
 void comment()
 {
 	char c, c1;

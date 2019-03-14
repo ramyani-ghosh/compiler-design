@@ -32,9 +32,11 @@ void insert(char *s, char *type, char*);
 void deletetempval(tempvals *temp);
 void tempval(char *var, char *val);
 void check_scope(char *s, char *type, char *token_type);
-
-
+void addval(char *var, char *val, int scope);
+char * get_val(char *var, int scope);
+void add_lines_used(char *s);
 extern char yytext[];
+extern int line_number;
 extern int column;
 extern FILE *yyin;
 int scope_error= 0;
@@ -66,7 +68,7 @@ char *wrong_symbol;
 %%
 
 primary_expression
-	: IDENTIFIER	{}
+	: IDENTIFIER	{ }
 	| CONSTANT		{ strcpy($$, $1);}
 	| STRING_LITERAL	{}
 	| '(' expression ')'	{}
@@ -107,15 +109,135 @@ unary_operator
 
 multiplicative_expression
 	: unary_expression	{ strcpy($$, $1); }
-	| multiplicative_expression '*' unary_expression	{}
-	| multiplicative_expression '/' unary_expression	{}
-	| multiplicative_expression '%' unary_expression	{}
+	| multiplicative_expression '*' unary_expression	{
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
+															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+															{
+																int s = atoi($1) * atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d1>=0 && d1<=9)
+															{
+																int s = atoi($1) * atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d2>=0 && d2<=9)
+															{
+																int s = atoi(get_val($1, curr_scope)) * atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else
+															{
+																int s = atoi(get_val($1, curr_scope)) * atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+
+														}
+	| multiplicative_expression '/' unary_expression	{
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
+															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+															{
+																int s = atoi($1) / atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d1>=0 && d1<=9)
+															{
+																int s = atoi($1) / atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d2>=0 && d2<=9)
+															{
+																int s = atoi(get_val($1, curr_scope)) / atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else
+															{
+																int s = atoi(get_val($1, curr_scope)) / atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+
+														}
+	| multiplicative_expression '%' unary_expression	{
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
+															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+															{
+																int s = atoi($1) % atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d1>=0 && d1<=9)
+															{
+																int s = atoi($1) % atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d2>=0 && d2<=9)
+															{
+																int s = atoi(get_val($1, curr_scope)) % atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else
+															{
+																int s = atoi(get_val($1, curr_scope)) % atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+
+														}
 	;
 
 additive_expression
 	: multiplicative_expression	{ strcpy($$, $1); }
-	| additive_expression '+' multiplicative_expression		{}
-	| additive_expression '-' multiplicative_expression		{}
+	| additive_expression '+' multiplicative_expression		{
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
+															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+															{
+																int s = atoi($1) + atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d1>=0 && d1<=9)
+															{
+																int s = atoi($1) + atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d2>=0 && d2<=9)
+															{
+																int s = atoi(get_val($1, curr_scope)) + atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else
+															{
+																int s = atoi(get_val($1, curr_scope)) + atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+
+														}
+	| additive_expression '-' multiplicative_expression		{
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
+															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+															{
+																int s = atoi($1) - atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d1>=0 && d1<=9)
+															{
+																int s = atoi($1) - atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+															else if(d2>=0 && d2<=9)
+															{
+																int s = atoi(get_val($1, curr_scope)) - atoi($3);
+																snprintf($$, 10, "%d", s);
+															}
+															else
+															{
+																int s = atoi(get_val($1, curr_scope)) - atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															}
+
+														}
 	;
 
 relational_expression
@@ -149,7 +271,9 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression	{ strcpy($$, $1); }
-	| unary_expression assignment_operator assignment_expression	{}
+	| unary_expression assignment_operator assignment_expression	{
+																		addval($1, $3, curr_scope);
+																	}
 	;
 
 assignment_operator
@@ -193,8 +317,19 @@ init_declarator_list
 init_declarator
 	: declarator 	{strcpy($$,$1);}
 	| declarator '=' initializer	{
-										tempval($1, $3);
-										strcpy($$,$1);
+										char val[10];
+										strcpy(val, $3);
+										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'')
+										{
+											tempval($1, val);
+											strcpy($$,$1);
+										}
+										else
+										{
+											strcpy(val,get_val($3, curr_scope));
+											tempval($1, val);
+											strcpy($$,$1);
+										}
 									}
 	;
 
@@ -279,6 +414,7 @@ selection_statement
 	: IF '(' expression ')' statement statement{}
 	| IF '(' expression ')' statement  declaration_list	statement{}
 	| IF '(' expression ')' statement ELSE statement statement {}
+	| IF '(' expression ')' statement ELSE statement declaration_list statement {}
 	;
 
 
@@ -323,16 +459,67 @@ symbol_table* initialize()
 	temp->value = (char*)malloc(sizeof(char)*10);
 	strcpy(temp->value, "0");
 	temp->lno = 0;
-	temp->lno_used = (int*)malloc(sizeof(int));
+	temp->lno_used = (int*)malloc(sizeof(int)*100);
 	temp->size = 0;
 	temp->next = NULL;
 	temp->scope = curr_scope;
 	return temp;
 }
 
+void addval(char *var, char *val, int scope)
+{
+	symbol_table *temp = st;
+	while(temp!=NULL)
+	{
+		if(strcmp(temp->name, var)==0)
+		{
+			if(temp->scope == scope)
+			{
+				strcpy(temp->value, val);
+			}
+		}
+		temp=temp->next;
+	}
+	add_lines_used(var);
+}
+
+char * get_val(char *var, int scope)
+{
+	symbol_table *temp = st;
+	while(temp!=NULL)
+	{
+		if(strcmp(temp->name, var)==0)
+		{
+			if(temp->scope == scope)
+			{
+				return temp->value;
+			}
+		}
+		temp=temp->next;
+	}
+	return "0";
+}
+
+void add_lines_used(char *s)
+{
+	symbol_table *temp = st;
+	while(temp!=NULL)
+	{
+		if(strcmp(temp->name, s)==0)
+		{
+			if(temp->scope == curr_scope)
+			{
+				temp->size +=1;
+				temp->lno_used[temp->size-1] = line_number;
+			}
+		}
+		temp=temp->next;
+	}
+}
+
 int lookup(char *s, char *type, char *token_type)
 {
-		check_scope(s,type,token_type);
+	check_scope(s,type,token_type);
 	if(st == NULL)
 	{
 
@@ -342,9 +529,9 @@ int lookup(char *s, char *type, char *token_type)
 	symbol_table *temp = st;
 	while(st!=NULL)
 	{
-		if(strcmp(st->name, s)==0&&strcmp(st->type,type)==0)
+		if(strcmp(st->name, s)==0 && st->scope == curr_scope) //strcmp(st->type,type)==0
 		{
-	  	check_scope(s,type,token_type);
+	  		check_scope(s,type,token_type);
 			return 0;
 		}
 		st = st->next;
@@ -408,11 +595,15 @@ void insert(char *s, char *type, char* token_type)
 	}
 	strcpy(new_entry->type, type);
 	strcpy(new_entry->symbol, token_type);
+	new_entry->lno = line_number;
+	new_entry->size = 1;
+	new_entry->lno_used[0] = line_number;
 	if(strcmp(type, "int")==0)
 		new_entry->size = 4;
 	else if(strcmp(type, "char")==0)
 		new_entry->size = 1;
 }
+
 
 void tempval(char *var, char *val)
 {
@@ -459,13 +650,32 @@ void deletetempval(tempvals *temp)
 void display()
 {
 	symbol_table *temp = st;
-	printf("Symbol \t\t Name \t\t Type \t\t Scope \t\t Value\n");
+	printf("\nSYMBOL TABLE\n");
+	printf("Symbol \t\t     Name \t\t Type \t\t Scope \t Value \t Line Number \t Lines Used\n");
+	printf("-----------------------------------------------------------------------------------------------------------------\n");
 	while(temp!=NULL)
 	{
 		if(strcmp(temp->name, "keyword")==0)
-			printf("%s \t %s \t\t %s \t\t %d \t\t %s\n",temp->symbol, temp->name, temp->type, temp->scope, temp->value);
+		{
+			printf("%s \t %8s \t\t %s \t\t %d \t %s \t %d \t\t [ ",temp->symbol, temp->name, temp->type, temp->scope, temp->value, temp->lno);
+			for(int i=0; i<temp->size; i++)
+			{
+				if((temp->lno_used[i])!=0)
+					printf("%d ", temp->lno_used[i]);
+			}
+
+			printf("]\n");
+		}
 		else
-			printf("%s \t %s \t\t %s \t\t %d \t\t %s\n",temp->symbol, temp->name, temp->type, temp->scope, temp->value);
+		{
+			printf("%s \t %8s \t\t %s \t\t %d \t %s \t %d \t\t [ ",temp->symbol, temp->name, temp->type, temp->scope, temp->value, temp->lno);
+			for(int i=0; i<temp->size; i++)
+			{
+				if(temp->lno_used[i]!=0)
+					printf("%d ", temp->lno_used[i]);
+			}
+			printf("]\n");
+		}
 
 		temp = temp->next;
 	}
@@ -497,6 +707,8 @@ int main()
 	lookup("continue", "NIL", "keyword");
 	lookup("break", "NIL", "keyword");
 	lookup("return", "NIL", "keyword");
+	lookup("printf", "NIL", "function");
+
 	yyparse();
 	fclose(yyin);
 	display(st);

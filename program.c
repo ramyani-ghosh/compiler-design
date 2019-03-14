@@ -3,17 +3,23 @@ int main()
 {
     //this is a comment
     int a=10;
+    int b = 20;
     int x;
-    x = a+ 2;
+    x = a + b +b;
+    // x = 10 /2;
     if(x>0)
     {
       int l;
-      float a=2;
 
       printf("Hello");
     }
+    else
+    {
+        char c = 'a';
+        int b = 5;
+        int z = b;
+    }
+    int okay=0 + x;
 
-    int okay=0;
-    
     return 1;
 }
