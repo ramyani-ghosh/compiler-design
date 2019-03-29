@@ -6,8 +6,6 @@ int curr_scope = 0;
 int opening_brackets = 0;
 int closing_brackets = 0;
 int nesting = 0;
-
-//Symbol table structure
 typedef struct symbol_table
 {
 	char *name;		//name of the token	(in case of keywords, the name is the "keyword" itself)
@@ -23,7 +21,6 @@ typedef struct symbol_table
 	struct symbol_table *next;	//symbol table is LL
 }symbol_table;
 
-//Structure to keep track of values
 typedef struct tempvals
 {
 	char *name;
@@ -33,20 +30,11 @@ typedef struct tempvals
 	struct tempvals *next;
 }tempvals;
 
-//Scope stack structure
 typedef struct scope_stack
 {
 	int scope;
 	struct scope_stack *next;
 }scope_stack;
-
-//Abstract Syntax Tree Structure
-typedef struct node
-{
-	struct node *left;
-	struct node *right;
-	char *token;
-}node;
 
 scope_stack *top = NULL;
 tempvals *tvhead =NULL;

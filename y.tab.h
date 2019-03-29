@@ -47,85 +47,95 @@ extern int yydebug;
   {
     IDENTIFIER = 258,
     CONSTANT = 259,
-    STRING_LITERAL = 260,
-    SIZEOF = 261,
-    INC_OP = 262,
-    DEC_OP = 263,
-    LE_OP = 264,
-    GE_OP = 265,
-    EQ_OP = 266,
-    NE_OP = 267,
-    H = 268,
-    AND_OP = 269,
-    OR_OP = 270,
-    MUL_ASSIGN = 271,
-    DIV_ASSIGN = 272,
-    MOD_ASSIGN = 273,
-    ADD_ASSIGN = 274,
-    SUB_ASSIGN = 275,
-    CHAR = 276,
-    SHORT = 277,
-    INT = 278,
-    LONG = 279,
-    FLOAT = 280,
-    DOUBLE = 281,
-    VOID = 282,
-    IF = 283,
-    ELSE = 284,
-    CONTINUE = 285,
-    BREAK = 286,
-    RETURN = 287,
-    HASH = 288,
-    INCLUDE = 289,
-    LIBRARY = 290
+    CHAR_CONSTANT = 260,
+    INT_CONSTANT = 261,
+    FLOAT_CONSTANT = 262,
+    STRING_LITERAL = 263,
+    SIZEOF = 264,
+    INC_OP = 265,
+    DEC_OP = 266,
+    LE_OP = 267,
+    GE_OP = 268,
+    EQ_OP = 269,
+    NE_OP = 270,
+    H = 271,
+    AND_OP = 272,
+    OR_OP = 273,
+    MUL_ASSIGN = 274,
+    DIV_ASSIGN = 275,
+    MOD_ASSIGN = 276,
+    ADD_ASSIGN = 277,
+    SUB_ASSIGN = 278,
+    CHAR = 279,
+    SHORT = 280,
+    INT = 281,
+    LONG = 282,
+    FLOAT = 283,
+    DOUBLE = 284,
+    VOID = 285,
+    IF = 286,
+    ELSE = 287,
+    WHILE = 288,
+    DO = 289,
+    CONTINUE = 290,
+    BREAK = 291,
+    RETURN = 292,
+    HASH = 293,
+    INCLUDE = 294,
+    LIBRARY = 295
   };
 #endif
 /* Tokens.  */
 #define IDENTIFIER 258
 #define CONSTANT 259
-#define STRING_LITERAL 260
-#define SIZEOF 261
-#define INC_OP 262
-#define DEC_OP 263
-#define LE_OP 264
-#define GE_OP 265
-#define EQ_OP 266
-#define NE_OP 267
-#define H 268
-#define AND_OP 269
-#define OR_OP 270
-#define MUL_ASSIGN 271
-#define DIV_ASSIGN 272
-#define MOD_ASSIGN 273
-#define ADD_ASSIGN 274
-#define SUB_ASSIGN 275
-#define CHAR 276
-#define SHORT 277
-#define INT 278
-#define LONG 279
-#define FLOAT 280
-#define DOUBLE 281
-#define VOID 282
-#define IF 283
-#define ELSE 284
-#define CONTINUE 285
-#define BREAK 286
-#define RETURN 287
-#define HASH 288
-#define INCLUDE 289
-#define LIBRARY 290
+#define CHAR_CONSTANT 260
+#define INT_CONSTANT 261
+#define FLOAT_CONSTANT 262
+#define STRING_LITERAL 263
+#define SIZEOF 264
+#define INC_OP 265
+#define DEC_OP 266
+#define LE_OP 267
+#define GE_OP 268
+#define EQ_OP 269
+#define NE_OP 270
+#define H 271
+#define AND_OP 272
+#define OR_OP 273
+#define MUL_ASSIGN 274
+#define DIV_ASSIGN 275
+#define MOD_ASSIGN 276
+#define ADD_ASSIGN 277
+#define SUB_ASSIGN 278
+#define CHAR 279
+#define SHORT 280
+#define INT 281
+#define LONG 282
+#define FLOAT 283
+#define DOUBLE 284
+#define VOID 285
+#define IF 286
+#define ELSE 287
+#define WHILE 288
+#define DO 289
+#define CONTINUE 290
+#define BREAK 291
+#define RETURN 292
+#define HASH 293
+#define INCLUDE 294
+#define LIBRARY 295
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 49 "proj.y" /* yacc.c:1909  */
+#line 68 "proj.y" /* yacc.c:1909  */
 
 	int ival;
 	char string[128];
 
-#line 129 "y.tab.h" /* yacc.c:1909  */
+#line 139 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

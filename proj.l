@@ -30,6 +30,8 @@ int line_number=1;
 "else"			{ count(); return(ELSE); }
 "float"			{ count(); return(FLOAT); }
 "if"			{ count(); return(IF); }
+"while"			{ count(); return(WHILE); }
+"do"			{ count(); return(DO); }
 "int"			{ count(); return(INT); }
 "long"			{ count(); return(LONG); }
 "return"		{ count(); return(RETURN); }
@@ -41,14 +43,13 @@ int line_number=1;
 
 {L}({L}|{D})*		{ count(); return(check_type()); }
 
-0[xX]{H}+{IS}?		{ count(); return(CONSTANT); }
-0{D}+{IS}?		{ count(); return(CONSTANT); }
-{D}+{IS}?		{ count(); return(CONSTANT); }
+[\'][.][\']		{ count(); return(CHAR_CONSTANT); }
+{D}+{IS}?		{ count(); return(INT_CONSTANT); }
 L?'(\\.|[^\\'])+'	{ count(); return(CONSTANT); }
 
 {D}+{E}{FS}?		{ count(); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{ count(); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{ count(); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{ count(); return(FLOAT_CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{ count(); return(FLOAT_CONSTANT); }
 
 L?\"(\\.|[^\\"])*\"	{ count(); return(STRING_LITERAL); }
 
