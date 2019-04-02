@@ -2,12 +2,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define COUNT 10
 int curr_scope = 0;
 int opening_brackets = 0;
 int closing_brackets = 0;
 int nesting = 0;
 
-//Symbol table structure
+typedef struct Node{
+	struct Node *left;
+	struct Node *right;
+	char token[100];
+	struct Node *val;
+	int level;
+}Node;
+
+typedef struct tree_stack{
+	Node *node;
+	struct tree_stack *next;
+}tree_stack;
+
 typedef struct symbol_table
 {
 	char *name;		//name of the token	(in case of keywords, the name is the "keyword" itself)
@@ -23,7 +36,6 @@ typedef struct symbol_table
 	struct symbol_table *next;	//symbol table is LL
 }symbol_table;
 
-//Structure to keep track of values
 typedef struct tempvals
 {
 	char *name;
@@ -33,27 +45,24 @@ typedef struct tempvals
 	struct tempvals *next;
 }tempvals;
 
-//Scope stack structure
 typedef struct scope_stack
 {
 	int scope;
 	struct scope_stack *next;
 }scope_stack;
 
-//Abstract Syntax Tree Structure
-typedef struct node
-{
-	struct node *left;
-	struct node *right;
-	char *token;
-}node;
-
-scope_stack *top = NULL;
+void get_levels(Node *root, int level);
+tree_stack *tree_top = NULL;
+scope_stack *scope_top = NULL;
 tempvals *tvhead =NULL;
 symbol_table *st = NULL;
 void push_scope(int);
 void pop_scope();
 int peep_scope();
+void create_node(char *token, int leaf);
+void push_tree(Node *newnode);
+Node* pop_tree();
+void printtree(Node *tree, int);
 int lookup(char *s, char *type, char*);
 symbol_table* initialize();
 void insert(char *s, char *type, char*);
@@ -99,11 +108,11 @@ char *wrong_symbol;
 %%
 
 primary_expression
-	: IDENTIFIER	{ strcpy($$, $1); exists($1);}
-    | CHAR_CONSTANT		{ strcpy($$, $1);}
-	| FLOAT_CONSTANT	{ strcpy($$, $1);}
-    | CONSTANT          { strcpy($$, $1);}
-    | INT_CONSTANT		{ strcpy($$, $1);}
+	: IDENTIFIER	{ strcpy($$, $1); exists($1); create_node($1, 1);}
+    | CHAR_CONSTANT		{ strcpy($$, $1); create_node($1, 1);}
+	| FLOAT_CONSTANT	{ strcpy($$, $1); create_node($1, 1);}
+    | CONSTANT          { strcpy($$, $1); create_node($1, 1);}
+    | INT_CONSTANT		{ strcpy($$, $1); create_node($1, 1);}
 	| STRING_LITERAL	{}
 	| '(' expression ')'	{}
 	;
@@ -178,6 +187,7 @@ unary_operator
 multiplicative_expression
 	: unary_expression	{ strcpy($$, $1); }
 	| multiplicative_expression '*' unary_expression	{
+															create_node("*", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -203,6 +213,7 @@ multiplicative_expression
 
 														}
 	| multiplicative_expression '/' unary_expression	{
+															create_node("/", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -228,6 +239,7 @@ multiplicative_expression
 
 														}
 	| multiplicative_expression '%' unary_expression	{
+															create_node("%", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -257,6 +269,7 @@ multiplicative_expression
 additive_expression
 	: multiplicative_expression	{ strcpy($$, $1); }
 	| additive_expression '+' multiplicative_expression		{
+															create_node("+", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -282,6 +295,7 @@ additive_expression
 
 														}
 	| additive_expression '-' multiplicative_expression		{
+															create_node("-", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -310,26 +324,26 @@ additive_expression
 
 relational_expression
 	: additive_expression	{ strcpy($$, $1); }
-	| relational_expression '<' additive_expression		{}
-	| relational_expression '>' additive_expression		{}
-	| relational_expression LE_OP additive_expression	{}
-	| relational_expression GE_OP additive_expression	{}
+	| relational_expression '<' additive_expression		{create_node("<", 0);}
+	| relational_expression '>' additive_expression		{create_node(">", 0);}
+	| relational_expression LE_OP additive_expression	{create_node("<=", 0);}
+	| relational_expression GE_OP additive_expression	{create_node(">=", 0);}
 	;
 
 equality_expression
 	: relational_expression	{ strcpy($$, $1); }
-	| equality_expression EQ_OP relational_expression	{}
-	| equality_expression NE_OP relational_expression	{}
+	| equality_expression EQ_OP relational_expression	{create_node("==", 0);}
+	| equality_expression NE_OP relational_expression	{create_node("!=", 0);}
 	;
 
 logical_and_expression
 	: equality_expression	{ strcpy($$, $1); }
-	| logical_and_expression AND_OP equality_expression		{}
+	| logical_and_expression AND_OP equality_expression		{create_node("&&", 0);}
 	;
 
 logical_or_expression
 	: logical_and_expression	{ strcpy($$, $1); }
-	| logical_or_expression OR_OP logical_and_expression	{}
+	| logical_or_expression OR_OP logical_and_expression	{create_node("||", 0);}
 	;
 
 conditional_expression
@@ -341,6 +355,7 @@ assignment_expression
 	: conditional_expression	{ strcpy($$, $1); }
 	| unary_expression assignment_operator assignment_expression	{
 																		addval($1, $3, curr_scope);
+																		create_node("=", 0);
 																	}
 	;
 
@@ -435,6 +450,7 @@ init_declarator_list
 init_declarator
 	: declarator 	{strcpy($$,$1);}
 	| declarator '=' initializer	{
+										create_node("=", 0);
 										char val[20];
 										strcpy(val, $3);
 										printf("%s", val);
@@ -463,7 +479,7 @@ type_specifier
 	;
 
 declarator
-	: IDENTIFIER            {strcpy($$,$1);}
+	: IDENTIFIER            {create_node($1, 1); strcpy($$,$1);}
 	/* | '(' declarator ')' */
 	| declarator '[' INT_CONSTANT ']' { tempval($1, "{0}", 1, atoi($3)); strcpy($$, $1); }
 	| declarator '(' parameter_list ')'	{}
@@ -473,7 +489,7 @@ declarator
 
 statement_list
 	: statement	{}
-	| statement_list statement	{}
+	| statement_list statement	{ create_node("stmt", 0);}
 	;
 
 expression_statement
@@ -482,12 +498,12 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' compound_statement {}
-	| IF '(' expression ')' compound_statement ELSE compound_statement{}
+	: IF '(' expression ')' compound_statement { create_node("if", 0);}
+	| IF '(' expression ')' compound_statement ELSE compound_statement{create_node("else", 0); create_node("if", 0);}
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' compound_statement {}
+	: WHILE '(' expression ')' compound_statement {create_node("while", 0);}
 	| DO compound_statement WHILE '(' expression ')' ';' {}
 	;
 
@@ -495,7 +511,7 @@ iteration_statement
 jump_statement
 	: CONTINUE ';'	{}
 	| BREAK ';'	{}
-	| RETURN ';'	{}
+	| RETURN ';'	{ create_node("return", 1);}
 	| RETURN expression ';'	{}
 	;
 
@@ -515,7 +531,7 @@ external_declaration
 	;
 
 function_definition
-	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function");}
+	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function"); create_node($2, 3);}
 	| declarator declaration compound_statement {}
 	| declarator compound_statement	{}
 	;
@@ -524,7 +540,7 @@ function_definition
 
 int scopeinstack(int scope)
 {
-	scope_stack *temp = top;
+	scope_stack *temp = scope_top;
 	while(temp!=NULL)
 	{
 		if(temp->scope == scope)
@@ -537,20 +553,161 @@ void push_scope(int scope)
 {
 	scope_stack *temp= (scope_stack*)malloc(sizeof(scope_stack));
 	temp->scope = scope;
-	temp->next = top;
-	top = temp;
+	temp->next = scope_top;
+	scope_top = temp;
 }
 
 void pop_scope()
 {
-	scope_stack *temp = top;
-	top = top->next;
+	scope_stack *temp = scope_top;
+	scope_top = scope_top->next;
 	free(temp);
 }
 
 int peep_scope()
 {
-	return top->scope;
+	return scope_top->scope;
+}
+
+void create_node(char *token, int leaf)
+{
+	Node *l;
+	Node *r;
+	if(leaf==0)
+	{
+		r = pop_tree();
+		l = pop_tree();
+	}
+	else if(leaf ==1)
+	{
+		l = NULL;
+		r = NULL;
+	}
+	else
+	{
+		l = pop_tree();
+		r = NULL;
+	}
+	Node *newnode = (Node*)malloc(sizeof(Node));
+	strcpy(newnode->token, token);
+	newnode->left = l;
+	newnode->right = r;
+	push_tree(newnode);
+}
+void push_tree(Node *newnode)
+{
+	tree_stack *temp= (tree_stack*)malloc(sizeof(tree_stack));
+	temp->node = newnode;
+	temp->next = tree_top;
+	tree_top = temp;
+}
+
+Node* pop_tree()
+{
+	tree_stack *temp = tree_top;
+	tree_top = tree_top->next;
+	Node *retnode = temp->node;
+	free(temp);
+	return retnode;
+}
+// void printtree(Node *tree, int x)
+// {
+// 	int i;
+// 	if (tree->left || tree->right)
+//  		printf("(");
+// 	printf(" %s ", tree->token);
+// 	if (tree->left)
+// 		printtree(tree->left, 0);
+// 	if (tree->right)
+// 		printtree(tree->right, 0);
+// 	if (tree->left || tree->right)
+// 		printf(")");
+// }
+void get_levels(Node *root, int level)
+{
+	root->level = level;
+	if(root->left == NULL && root->right == NULL)
+	{
+		return;
+	}
+	if(root->left == NULL)
+	{
+		get_levels(root->right, level+1);
+	}
+	else if(root->right == NULL)
+	{
+		get_levels(root->left, level+1);
+	}
+	else
+	{
+		get_levels(root->left, level+1);
+		get_levels(root->right, level+1);
+	}
+}
+//
+// void printtree(Node *root, int space)
+// {
+//     // Base case
+//     if (root == NULL)
+//         return;
+//
+//     // Increase distance between levels
+//     space += COUNT;
+//
+//     // Process right child first
+//     printtree(root->right, space);
+//
+//     // Print current node after space
+//     // count
+//     printf("\n");
+//     for (int i = COUNT; i < space; i++)
+//         printf(" ");
+//     //printf("%d\n", root->level);
+// 	printf("%s\n", root->token);
+//
+//     // Process left child
+//     printtree(root->left, space);
+// }
+int getmaxlevel(Node *root)
+{
+	int count=0;
+	Node *temp= root;
+	while(temp->left!=NULL)
+	{
+		count++;
+		temp=temp->left;
+	}
+	return count*2;
+}
+
+void printtree(Node *root, int space)
+{
+    // Base case
+    if (root == NULL)
+        return;
+
+    // Increase distance between levels
+    //space += COUNT;
+	int s=space-root->level;
+
+
+    // Print current node after space
+    // count
+
+
+    for (int i = 0; i < s*2; i++)
+        printf("\t");
+    //printf("%d\n", root->level);
+
+	printf("%s", root->token);
+
+    // Process left child
+    printtree(root->left, space);
+	printf("\t\t");
+	// Process right child first
+    printtree(root->right, space);
+	printf("\n\n");
+
 }
 symbol_table* initialize()
 {
@@ -569,6 +726,7 @@ symbol_table* initialize()
 	temp->isarray = 0;
 	return temp;
 }
+
 
 void addval(char *var, char *val, int scope)
 {
@@ -841,15 +999,24 @@ int main()
 	lookup("void", "NIL", "keyword");
 	lookup("if", "NIL", "keyword");
 	lookup("else", "NIL", "keyword");
+	lookup("while", "NIL", "keyword");
+	lookup("do", "NIL", "keyword");
 	lookup("continue", "NIL", "keyword");
 	lookup("break", "NIL", "keyword");
 	lookup("return", "NIL", "keyword");
 	lookup("printf", "NIL", "function");
-	top = (scope_stack*)malloc(sizeof(scope_stack));
-	top->scope = 0;
-	top->next=NULL;
-
+	scope_top = (scope_stack*)malloc(sizeof(scope_stack));
+	scope_top->scope = 0;
+	scope_top->next=NULL;
+	tree_top = (tree_stack*)malloc(sizeof(tree_stack));
+	tree_top->node = NULL;
+	tree_top->next = NULL;
+	struct Node *root;
 	yyparse();
+	root = pop_tree();
+	get_levels(root, 1);
+	int s= getmaxlevel(root);
+	printtree(root,s);
 	fclose(yyin);
 	display(st);
 }
