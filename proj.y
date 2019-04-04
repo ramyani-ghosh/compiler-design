@@ -51,18 +51,22 @@ typedef struct scope_stack
 	struct scope_stack *next;
 }scope_stack;
 
+typedef struct quad
+{
+		char op;
+		char arg1;
+		char arg2;
+		char res;
+}quad;
+
+
 void get_levels(Node *root, int level);
-tree_stack *tree_top = NULL;
-scope_stack *scope_top = NULL;
-tempvals *tvhead =NULL;
-symbol_table *st = NULL;
 void push_scope(int);
 void pop_scope();
 int peep_scope();
 void create_node(char *token, int leaf);
 void push_tree(Node *newnode);
 Node* pop_tree();
-void printtree(Node *tree, int);
 int lookup(char *s, char *type, char*);
 symbol_table* initialize();
 void insert(char *s, char *type, char*);
@@ -75,10 +79,21 @@ void add_lines_used(char *s);
 void exists(char *s);
 void set_arr();
 void unset_arr();
+void printtree(Node *tree);
+int getmaxlevel(Node *root);
+void printGivenLevel(Node* root, int level, int h);
+void printICG(quad *q);
+
 extern char yytext[];
 extern int line_number;
 extern int column;
 extern FILE *yyin;
+
+//Global variables
+tree_stack *tree_top = NULL;
+scope_stack *scope_top = NULL;
+tempvals *tvhead =NULL;
+symbol_table *st = NULL;
 int scope_error= 0;
 char *wrong_symbol;
 
@@ -644,30 +659,7 @@ void get_levels(Node *root, int level)
 		get_levels(root->right, level+1);
 	}
 }
-//
-// void printtree(Node *root, int space)
-// {
-//     // Base case
-//     if (root == NULL)
-//         return;
-//
-//     // Increase distance between levels
-//     space += COUNT;
-//
-//     // Process right child first
-//     printtree(root->right, space);
-//
-//     // Print current node after space
-//     // count
-//     printf("\n");
-//     for (int i = COUNT; i < space; i++)
-//         printf(" ");
-//     //printf("%d\n", root->level);
-// 	printf("%s\n", root->token);
-//
-//     // Process left child
-//     printtree(root->left, space);
-// }
+
 int getmaxlevel(Node *root)
 {
 	int count=0;
@@ -679,36 +671,59 @@ int getmaxlevel(Node *root)
 	}
 	return count*2;
 }
-
-void printtree(Node *root, int space)
+void printtree(Node* root)
 {
-    // Base case
+    int h = getmaxlevel(root)-1;
+    int i;
+
+		printf("\n\n ͟A͟b͟s͟t͟r͟a͟c͟t͟ ͟S͟y͟n͟t͟a͟x͟ ͟T͟r͟e͟e͟ \n\n");
+    for (i=1; i<=h; i++)
+    {
+			  printf("\t");
+				for(int j=0;j<=h+1-i;j++)
+				{
+					printf("     ");
+				}
+        printGivenLevel(root, i,h);
+        printf("\n\n\n");
+
+    }
+}
+
+void printICG(quad *q)
+{
+	printf("\n\n ͟I͟n͟t͟e͟r͟m͟e͟d͟i͟a͟t͟e͟ ͟C͟o͟d͟e͟\n\n");
+	printf("\t  op");
+	printf("\t    arg1");
+	printf("\t    arg2");
+	printf("\t    result");
+	printf("\n\t ____________________________________________________\n\n");
+}
+
+
+void printGivenLevel(Node* root, int level, int h)
+{
     if (root == NULL)
         return;
-
-    // Increase distance between levels
-    //space += COUNT;
-	int s=space-root->level;
-
-
-    // Print current node after space
-    // count
-
-
-    for (int i = 0; i < s*2; i++)
-        printf("\t");
-    //printf("%d\n", root->level);
-
-	printf("%s", root->token);
-
-    // Process left child
-    printtree(root->left, space);
-	printf("\t\t");
-	// Process right child first
-    printtree(root->right, space);
-	printf("\n\n");
-
+    if (level == 1)
+		{
+			for(int j=0;j<=h-1-level;j++)
+			{
+					printf(" ");
+			}
+	        printf("%s ", root->token);
+		}
+    else if (level > 1)
+    {
+        printGivenLevel(root->left, level-1,h);
+				for(int j=0;j<=h-1-level;j++)
+				{
+						printf(" ");
+				}
+        printGivenLevel(root->right, level-1,h);
+    }
 }
+
 symbol_table* initialize()
 {
 	symbol_table *temp = (symbol_table*)malloc(sizeof(symbol_table));
@@ -944,9 +959,9 @@ void deletetempval(tempvals *temp)
 void display()
 {
 	symbol_table *temp = st;
-	printf("\nSYMBOL TABLE\n");
+	printf("\n ͟S͟y͟m͟b͟o͟l͟ ͟T͟a͟b͟l͟e͟ \n\n");
 	printf("Symbol \t\t     Name \t\t Array \t\t Type \t\t Scope \t Value \t Size \t Line Number \t Lines Used\n");
-	printf("-----------------------------------------------------------------------------------------------------------------\n");
+	printf("------------------------------------------------------------------------------------------------------------------------------------\n");
 	while(temp!=NULL)
 	{
 		if(strcmp(temp->name, "keyword")==0)
@@ -1005,6 +1020,7 @@ int main()
 	lookup("break", "NIL", "keyword");
 	lookup("return", "NIL", "keyword");
 	lookup("printf", "NIL", "function");
+
 	scope_top = (scope_stack*)malloc(sizeof(scope_stack));
 	scope_top->scope = 0;
 	scope_top->next=NULL;
@@ -1014,9 +1030,16 @@ int main()
 	struct Node *root;
 	yyparse();
 	root = pop_tree();
+	quad *q;
+
+	//Assign levels to nodes
 	get_levels(root, 1);
-	int s= getmaxlevel(root);
-	printtree(root,s);
-	fclose(yyin);
+	//Display symbol table
 	display(st);
+	//Display AST
+	printtree(root);
+	//Display IC
+	printICG(q);
+	fclose(yyin);
+
 }
