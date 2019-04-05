@@ -26,7 +26,7 @@ typedef struct symbol_table
 	char *name;		//name of the token	(in case of keywords, the name is the "keyword" itself)
 	char *symbol;
 	char *type;		//type of token (in case of keywords, the type is the name of the keyword)
-	char value[30][30]; 	//saving value as a string
+	char *value; 	//saving value as a string
 	int lno;		//line number where token is declared (default 0)
 	int *lno_used;	//line number where token is first used (defult 0)
 	int size;		//size of the token
@@ -39,7 +39,7 @@ typedef struct symbol_table
 typedef struct tempvals
 {
 	char *name;
-	char value[30][30];
+	char *value;
 	int isarray;
 	int size;
 	struct tempvals *next;
@@ -60,15 +60,13 @@ typedef struct quad
 }quad;
 
 
-int get_levels(Node *root, int level);
+void get_levels(Node *root, int level);
 void push_scope(int);
 void pop_scope();
 int peep_scope();
 void create_node(char *token, int leaf);
 void push_tree(Node *newnode);
 Node* pop_tree();
-Node* pop_tree_2();
-void modify_top(char *s);
 int lookup(char *s, char *type, char*);
 symbol_table* initialize();
 void insert(char *s, char *type, char*);
@@ -82,7 +80,6 @@ void exists(char *s);
 void set_arr();
 void unset_arr();
 void printtree(Node *tree);
-void displaytree(Node *tree);
 int getmaxlevel(Node *root);
 void printGivenLevel(Node* root, int level, int h);
 void printICG(quad *q);
@@ -120,7 +117,7 @@ char *wrong_symbol;
 %type <string> IDENTIFIER CONSTANT CHAR_CONSTANT FLOAT_CONSTANT INT_CONSTANT STRING_LITERAL SIZEOF INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP H AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN CHAR SHORT INT LONG FLOAT DOUBLE VOID
 %type <string>  IF ELSE  CONTINUE BREAK RETURN HASH INCLUDE LIBRARY
 %type <string> declaration init_declarator_list init_declarator type_specifier declarator logical_and_expression logical_or_expression conditional_expression assignment_expression initializer
-%type <string> primary_expression postfix_expression unary_expression multiplicative_expression additive_expression relational_expression equality_expression expression initializer_list
+%type <string> primary_expression postfix_expression unary_expression multiplicative_expression additive_expression relational_expression equality_expression expression
 
 %start hashinclude
 %%
@@ -137,14 +134,7 @@ primary_expression
 
 postfix_expression
 	: primary_expression	{ strcpy($$, $1); }
-	| postfix_expression '[' expression ']'	{
-												char s[30];
-												strcpy(s, $1);
-												strcat(s, "[");
-												strcat(s, $3);
-												strcat(s, "]");
-												strcpy($$, s);
-											}
+	| postfix_expression '[' expression ']'	{}
 	| postfix_expression '(' ')'	{}
 	| postfix_expression '(' argument_expression_list ')'	{}
 	| postfix_expression '.' IDENTIFIER		{ exists($3);}
@@ -165,9 +155,6 @@ postfix_expression
 			addval($1, str, curr_scope);
 		}
 
-		create_node("1",1);
-		create_node("+", 0);
-
 	}
 	| postfix_expression DEC_OP		{
 
@@ -186,9 +173,6 @@ postfix_expression
 			addval($1, str, curr_scope);
 		}
 
-		create_node("1",1);
-		create_node("-", 0);
-
 	}
 	;
 
@@ -199,47 +183,8 @@ argument_expression_list
 
 unary_expression
 	: postfix_expression	{ strcpy($$, $1); }
-	| INC_OP unary_expression	{
-
-		int d1 = $2[0] - '0';
-		if(d1>=0 && d1 <= 9)
-		{
-			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
-			exit(0);
-		}
-		else
-		{
-			int s = atoi(get_val($2, curr_scope)) + 1;
-			char str[10];
-			// printf("%d", s);
-			snprintf(str, 10, "%d", s);
-			addval($2, str, curr_scope);
-		}
-
-		create_node("1",1);
-		create_node("+", 0);
-
-	}
-	| DEC_OP unary_expression	{
-
-		int d1 = $2[0] - '0';
-		if(d1>=0 && d1 <= 9)
-		{
-			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
-			exit(0);
-		}
-		else
-		{
-			int s = atoi(get_val($2, curr_scope)) - 1;
-			char str[10];
-			// printf("%d", s);
-			snprintf(str, 10, "%d", s);
-			addval($2, str, curr_scope);
-		}
-		create_node("1",1);
-		create_node("-", 0);
-
-	}
+	| INC_OP unary_expression	{}
+	| DEC_OP unary_expression	{}
 	| unary_operator unary_expression	{}
 	| SIZEOF unary_expression	{}
 	| SIZEOF '(' type_specifier ')'	{}
@@ -394,219 +339,26 @@ additive_expression
 
 relational_expression
 	: additive_expression	{ strcpy($$, $1); }
-	| relational_expression '<' additive_expression		{
-
-															create_node("<", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) < atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) < atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) < atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) < atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
-	| relational_expression '>' additive_expression		{
-															create_node(">", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) > atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) > atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) > atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) > atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
-	| relational_expression LE_OP additive_expression	{
-															create_node("<=", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) <= atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) <= atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) <= atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) <= atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
-	| relational_expression GE_OP additive_expression	{
-															create_node(">=", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) >= atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) >= atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) >= atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) >= atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
+	| relational_expression '<' additive_expression		{create_node("<", 0);}
+	| relational_expression '>' additive_expression		{create_node(">", 0);}
+	| relational_expression LE_OP additive_expression	{create_node("<=", 0);}
+	| relational_expression GE_OP additive_expression	{create_node(">=", 0);}
 	;
 
 equality_expression
 	: relational_expression	{ strcpy($$, $1); }
-	| equality_expression EQ_OP relational_expression	{
-															create_node("==", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) == atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) == atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) == atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) == atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
-	| equality_expression NE_OP relational_expression	{
-															create_node("!=", 0);
-															int d1 = $1[0] - '0';
-															int d2 = $3[0] - '0';
-															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-															{
-																int s = atoi($1) != atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d1>=0 && d1<=9)
-															{
-																int s = atoi($1) != atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-															else if(d2>=0 && d2<=9)
-															{
-																int s = atoi(get_val($1, curr_scope)) != atoi($3);
-																snprintf($$, 10, "%d", s);
-															}
-															else
-															{
-																int s = atoi(get_val($1, curr_scope)) != atoi(get_val($3, curr_scope));
-																snprintf($$, 10, "%d", s);
-															}
-														}
+	| equality_expression EQ_OP relational_expression	{create_node("==", 0);}
+	| equality_expression NE_OP relational_expression	{create_node("!=", 0);}
 	;
 
 logical_and_expression
 	: equality_expression	{ strcpy($$, $1); }
-	| logical_and_expression AND_OP equality_expression		{
-																create_node("&&", 0);
-																int d1 = $1[0] - '0';
-																int d2 = $3[0] - '0';
-																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-																{
-																	int s = atoi($1) && atoi($3);
-																	snprintf($$, 10, "%d", s);
-																}
-																else if(d1>=0 && d1<=9)
-																{
-																	int s = atoi($1) && atoi(get_val($3, curr_scope));
-																	snprintf($$, 10, "%d", s);
-																}
-																else if(d2>=0 && d2<=9)
-																{
-																	int s = atoi(get_val($1, curr_scope)) && atoi($3);
-																	snprintf($$, 10, "%d", s);
-																}
-																else
-																{
-																	int s = atoi(get_val($1, curr_scope)) && atoi(get_val($3, curr_scope));
-																	snprintf($$, 10, "%d", s);
-																}
-															}
+	| logical_and_expression AND_OP equality_expression		{create_node("&&", 0);}
 	;
 
 logical_or_expression
 	: logical_and_expression	{ strcpy($$, $1); }
-	| logical_or_expression OR_OP logical_and_expression	{
-																create_node("||", 0);
-																int d1 = $1[0] - '0';
-																int d2 = $3[0] - '0';
-																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
-																{
-																	int s = atoi($1) || atoi($3);
-																	snprintf($$, 10, "%d", s);
-																}
-																else if(d1>=0 && d1<=9)
-																{
-																	int s = atoi($1) || atoi(get_val($3, curr_scope));
-																	snprintf($$, 10, "%d", s);
-																}
-																else if(d2>=0 && d2<=9)
-																{
-																	int s = atoi(get_val($1, curr_scope)) || atoi($3);
-																	snprintf($$, 10, "%d", s);
-																}
-																else
-																{
-																	int s = atoi(get_val($1, curr_scope)) || atoi(get_val($3, curr_scope));
-																	snprintf($$, 10, "%d", s);
-																}
-															}
+	| logical_or_expression OR_OP logical_and_expression	{create_node("||", 0);}
 	;
 
 conditional_expression
@@ -660,23 +412,13 @@ identifier_list
 
 initializer
 	: assignment_expression	{ strcpy($$, $1); }
-	| '{' initializer_list '}'	{ 	char s[20] = "{";
-									strcat(s, $2);
-									strcat(s, "}");
-									strcpy($$, s);
-								}
+	| '{' initializer_list '}'	{}
 	| '{' initializer_list ',' '}'	{}
 	;
 
 initializer_list
-	: initializer	{ strcpy($$, $1);}
-	| initializer_list ',' initializer	{
-											char s[100] = "";
-											strcat(s, $1);
-										 	strcat(s, ", ");
-											strcat(s, $3);
-											strcpy($$, s);
-										}
+	: initializer	{}
+	| initializer_list ',' initializer	{}
 	;
 
 statement //HERE YOU MADE CHANGE
@@ -726,14 +468,11 @@ init_declarator
 										create_node("=", 0);
 										char val[20];
 										strcpy(val, $3);
+										printf("%s", val);
 										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'')
 										{
 											tempval($1, val, 0, 1);
 											strcpy($$,$1);
-										}
-										else if($3[0]=='{')
-										{
-											tempval($1, $3, 1, 0);
 										}
 										else
 										{
@@ -780,17 +519,15 @@ selection_statement
 
 iteration_statement
 	: WHILE '(' expression ')' compound_statement {create_node("while", 0);}
-	| DO compound_statement WHILE '(' expression ')' ';' {create_node("do-while", 0);}
+	| DO compound_statement WHILE '(' expression ')' ';' {}
 	;
 
 
 jump_statement
 	: CONTINUE ';'	{}
 	| BREAK ';'	{}
-	| RETURN ';'	{ create_node("return",1);}
-	| RETURN expression ';'	{ char s[20] = "return ";
-							  strcat(s, $2);
-							  modify_top(s);}
+	| RETURN ';'	{ create_node("return", 1);}
+	| RETURN expression ';'	{}
 	;
 
 hashinclude
@@ -809,7 +546,7 @@ external_declaration
 	;
 
 function_definition
-	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function"); pop_tree_2();}
+	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function"); create_node($2, 3);}
 	| declarator declaration compound_statement {}
 	| declarator compound_statement	{}
 	;
@@ -879,80 +616,64 @@ void push_tree(Node *newnode)
 	temp->next = tree_top;
 	tree_top = temp;
 }
-void modify_top(char *s)
-{
-	strcpy(tree_top->node->token, s);
-}
 
 Node* pop_tree()
 {
-	if(tree_top==NULL)
-		return NULL;
 	tree_stack *temp = tree_top;
 	tree_top = tree_top->next;
 	Node *retnode = temp->node;
 	free(temp);
 	return retnode;
 }
-Node* pop_tree_2()
-{
-	if(tree_top==NULL)
-		return NULL;
-	tree_stack *temp = tree_top->next;
-	tree_top->next = tree_top->next->next;
-	Node *retnode = temp->node;
-	free(temp);
-	return retnode;
-}
-void printtree(Node *tree)
-{
-	int i;
-	if (tree->left || tree->right)
- 		printf("(");
-	printf(" %s ", tree->token);
-	if (tree->left)
-		printtree(tree->left);
-	if (tree->right)
-		printtree(tree->right);
-	if (tree->left || tree->right)
-		printf(")");
-}
-int get_levels(Node *root, int level)
+// void printtree(Node *tree, int x)
+// {
+// 	int i;
+// 	if (tree->left || tree->right)
+//  		printf("(");
+// 	printf(" %s ", tree->token);
+// 	if (tree->left)
+// 		printtree(tree->left, 0);
+// 	if (tree->right)
+// 		printtree(tree->right, 0);
+// 	if (tree->left || tree->right)
+// 		printf(")");
+// }
+void get_levels(Node *root, int level)
 {
 	root->level = level;
 	if(root->left == NULL && root->right == NULL)
 	{
-		return level;
+		return;
 	}
-	int m, m1, m2;
 	if(root->left == NULL)
 	{
-		m = get_levels(root->right, level+1);
+		get_levels(root->right, level+1);
 	}
 	else if(root->right == NULL)
 	{
-		m = get_levels(root->left, level+1);
+		get_levels(root->left, level+1);
 	}
 	else
 	{
-		m1 = get_levels(root->left, level+1);
-		m2 = get_levels(root->right, level+1);
-		if(m1>m2)
-			m = m1;
-		else
-			m=m2;
+		get_levels(root->left, level+1);
+		get_levels(root->right, level+1);
 	}
-	return m;
 }
 
 int getmaxlevel(Node *root)
 {
-	return get_levels(root, 1);
+	int count=0;
+	Node *temp= root;
+	while(temp->left!=NULL)
+	{
+		count++;
+		temp=temp->left;
+	}
+	return count*2;
 }
-void displaytree(Node* root)
+void printtree(Node* root)
 {
-    int h = getmaxlevel(root)+2;
-	printf("\n max lev= %d\n",h);
+    int h = getmaxlevel(root)-1;
     int i;
 
 		printf("\n\n ͟A͟b͟s͟t͟r͟a͟c͟t͟ ͟S͟y͟n͟t͟a͟x͟ ͟T͟r͟e͟e͟ \n\n");
@@ -1009,7 +730,8 @@ symbol_table* initialize()
 	temp->name = (char*)malloc(sizeof(char)*128);
 	temp->type = (char*)malloc(sizeof(char)*10);
 	temp->symbol = (char*)malloc(sizeof(char)*11);
-	strcpy(temp->value[0], "0");
+	temp->value = (char*)malloc(sizeof(char)*10);
+	strcpy(temp->value, "0");
 	temp->lno = 0;
 	temp->lno_used = (int*)malloc(sizeof(int)*100);
 	temp->size = 0;
@@ -1024,55 +746,14 @@ symbol_table* initialize()
 void addval(char *var, char *val, int scope)
 {
 	symbol_table *temp = st;
-	if((0<= val[0]-'0' && 9>=val[0]-'0') || val[0]=='\'')
-	{
-		int k;
-	}
-	else
-	{
-		strcpy(val,get_val(val, curr_scope));
-	}
 	while(temp!=NULL)
 	{
 		if(strcmp(temp->name, var)==0)
 		{
-			if(temp->scope == scope && temp->isarray!=1)
+			if(temp->scope == scope)
 			{
-				strcpy(temp->value[0], val);
+				strcpy(temp->value, val);
 			}
-			else if(temp->isarray)
-			{
-				// if(val[0]!=)
-				printf("\n%*s\n%*s   <--- Assignment to expression with array type \n", column, "^", column, wrong_symbol);
-				exit(0);
-			}
-		}
-		else if(temp->name[0]==var[0])
-		{
-			int i=0;
-			int flag = 0;
-			for(i=0; temp->name[i]!= '\0';i++)
-			{
-				if(var[i]!=temp->name[i])
-				{
-					flag = 1;
-					break;
-				}
-			}
-			//val is the value to be stored
-			//temp->name and var is the name of the variable
-			if(flag)
-				break;
-			i = i+1;
-			char size[10]="";
-			int pos = i;
-			while(var[i]!=']')
-			{
-				size[i-pos] = var[i];
-				i++;
-			}
-			int index = atoi(size);
-			strcpy(temp->value[index], val);
 		}
 		temp=temp->next;
 	}
@@ -1084,41 +765,12 @@ char * get_val(char *var, int scope)
 	symbol_table *temp = st;
 	while(temp!=NULL)
 	{
-		// printf("%s ", temp->name, var);
 		if(strcmp(temp->name, var)==0)
 		{
-			if(temp->scope <= scope)
+			if(temp->scope == scope)
 			{
-				return temp->value[0];
+				return temp->value;
 			}
-		}
-		else if(temp->name[0]==var[0])
-		{
-			int i=0;
-			int flag = 0;
-			for(i=0; temp->name[i]!= '\0';i++)
-			{
-				if(var[i]!=temp->name[i])
-				{
-					flag = 1;
-					break;
-				}
-			}
-			if(flag)
-			{
-				temp=temp->next;
-				continue;
-			}
-			i = i+1;
-			char size[10]="";
-			int pos = i;
-			while(var[i]!=']')
-			{
-				size[i-pos] = var[i];
-				i++;
-			}
-			int index = atoi(size);
-			return temp->value[index];
 		}
 		temp=temp->next;
 	}
@@ -1233,12 +885,7 @@ void insert(char *s, char *type, char* token_type)
 	{
 		if(strcmp(new_entry->name, temp->name)==0)
 		{
-			for(int i=0; i<temp->size; i++)
-			{
-				strcpy(new_entry->value[i], temp->value[i]);
-				// printf("%s", temp->value[i]);
-			}
-
+			strcpy(new_entry->value, temp->value);
 			new_entry->isarray = temp ->isarray;
 			arrsize = temp->size;
 			deletetempval(temp);
@@ -1269,49 +916,17 @@ void tempval(char *var, char *val, int isarray, int size)
 
 	tempvals *temp = (tempvals*)malloc(sizeof(tempvals));
 	temp->name = (char*)malloc(sizeof(char)*128);
+	temp->value = (char*)malloc(sizeof(char)*10);
 	temp->next = NULL;
 	strcpy(temp->name, var);
-	strcpy(temp->value[0], val);
+	strcpy(temp->value, val);
 	temp->isarray = isarray;
 	temp->size = size;
-	tempvals *t =tvhead;
-	while(t!=NULL)
-	{
-		if(strcmp(t->name, temp->name)==0)
-		{
-
-			if(isarray)
-			{
-				int pos = 0;
-				int i=1;
-				int index = 0;
-				while(val[i]!='}')
-				{
-					char num[30]="";
-					pos = i;
-					while(val[i]!=',' &&val[i]!='}' &&val[i]!=' ')
-					{
-						num[i-pos] = val[i];
-						i++;
-					}
-					if(strcmp(num, "")!=0)
-						strcpy(t->value[index++], num);
-					if(val[i]=='}')
-						break;
-					i++;
-				}
-				return;
-			}
-		}
-		t=t->next;
-	}
-
 	if(tvhead == NULL)
 	{
 		tvhead = temp;
 	}
-	else
-	{
+	else{
 		tempvals *t = tvhead;
 		while(t->next!=NULL)
 		{
@@ -1338,45 +953,38 @@ void deletetempval(tempvals *temp)
 	}
 
 	free(temp->name);
+	free(temp->value);
 	free(temp);
 }
 void display()
 {
 	symbol_table *temp = st;
 	printf("\n ͟S͟y͟m͟b͟o͟l͟ ͟T͟a͟b͟l͟e͟ \n\n");
-	printf("Symbol \t\t     Name \t\t Array \t\t Type \t\t Scope \t Size \t Line Number \t Lines Used \t Value \n");
+	printf("Symbol \t\t     Name \t\t Array \t\t Type \t\t Scope \t Value \t Size \t Line Number \t Lines Used\n");
 	printf("------------------------------------------------------------------------------------------------------------------------------------\n");
 	while(temp!=NULL)
 	{
 		if(strcmp(temp->name, "keyword")==0)
 		{
-			printf("%s \t %8s \t\t %d \t\t %s \t\t %d \t %d \t %d \t\t [ ",temp->symbol, temp->name, temp->isarray, temp->type, temp->scope, temp->var_size, temp->lno);
+			printf("%s \t %8s \t\t %d \t\t %s \t\t %d \t %s \t %d \t %d \t\t\t [ ",temp->symbol, temp->name, temp->isarray, temp->type, temp->scope, temp->value, temp->var_size, temp->lno);
 			for(int i=0; i<temp->size; i++)
 			{
 				if((temp->lno_used[i])!=0)
 					printf("%d ", temp->lno_used[i]);
 			}
-			printf("]\t\t");
-			for(int i=0; i<30; i++)
-			{
-				printf("%s ", temp->value[i]);
-			}
-			printf("\n");
+
+			printf("]\n");
 		}
 		else
 		{
-			printf("%s \t %8s \t\t %d \t\t %s \t\t %d \t %d \t %d \t\t [ ",temp->symbol, temp->name, temp->isarray, temp->type, temp->scope, temp->var_size, temp->lno);
+			printf("%s \t %8s \t\t %d \t\t %s \t\t %d \t %s \t %d \t %d \t\t\t [ ",temp->symbol, temp->name, temp->isarray, temp->type, temp->scope, temp->value, temp->var_size, temp->lno);
 			for(int i=0; i<temp->size; i++)
 			{
 				if((temp->lno_used[i])!=0)
 					printf("%d ", temp->lno_used[i]);
 			}
-			printf("]\t\t");
-			for(int i=0; i<30; i++)
-			{
-				printf("%s ", temp->value[i]);
-			}
-			printf("\n");
+
+			printf("]\n");
 		}
 
 		temp = temp->next;
@@ -1424,11 +1032,12 @@ int main()
 	root = pop_tree();
 	quad *q;
 
+	//Assign levels to nodes
+	get_levels(root, 1);
 	//Display symbol table
 	display(st);
 	//Display AST
 	printtree(root);
-	displaytree(root);
 	//Display IC
 	printICG(q);
 	fclose(yyin);

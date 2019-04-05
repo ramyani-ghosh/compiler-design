@@ -1,14 +1,22 @@
 #include<stdio.h>
-int main()
+void main()
 {
-    int z = 10;
-    if(z==10)
+    int x = "abc";
+    int a[3] ={1,2,3};
+    int b = a[2];
+
+    while(x==1)
     {
-        int m = 12;
+        if(a==b)
+        {
+            char c='a';
+        }
+        else
+        {
+            char c='b';
+        }
     }
-    else
-    {
-        int m = 13;
-    }
-    return 1;
+    do {
+        int x = 20;
+    } while(x>10);
 }
