@@ -14,7 +14,6 @@ typedef struct Node{
 	struct Node *right;
 	char token[100];
 	struct Node *val;
-	int level;
 }Node;
 
 typedef struct tree_stack{
@@ -59,9 +58,13 @@ typedef struct quad
 		char arg2;
 		char res;
 }quad;
+typedef struct Trunk
+{
+	struct Trunk *prev;
+	char str[100];
+}Trunk;
 
 
-int get_levels(Node *root, int level);
 void push_scope(int);
 void pop_scope();
 int peep_scope();
@@ -83,9 +86,8 @@ void exists(char *s);
 void set_arr();
 void unset_arr();
 void printtree(Node *tree);
-void displaytree(Node *tree);
-int getmaxlevel(Node *root);
-void printGivenLevel(Node* root, int level, int h);
+void printTree(Node* root, Trunk*,int);
+void showTrunks(Trunk *p);
 void printICG(quad *q);
 
 extern char yytext[];
@@ -746,7 +748,7 @@ init_declarator
 										create_node("=", 0);
 										char val[20];
 										strcpy(val, $3);
-										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'')
+										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'' || $3[0]== '"')
 										{
 											tempval($1, val, 0, 1);
 											strcpy($$,$1);
@@ -938,6 +940,53 @@ Node* pop_tree_2()
 	free(temp);
 	return retnode;
 }
+// Helper function to print branches of the binary tree
+void showTrunks(Trunk *p)
+{
+	if (p == NULL)
+		return;
+
+	showTrunks(p->prev);
+
+	printf("%s",p->str);
+}
+
+// Recursive function to print binary tree
+// It uses inorder traversal
+void printTree(Node *root, Trunk *prev, int isLeft)
+{
+	if (root == NULL)
+		return;
+
+	char prev_str[100] = "	  ";
+	Trunk *trunk = (Trunk*)malloc(sizeof(Trunk));
+	trunk->prev = prev;
+	strcpy(trunk->str, prev_str);
+
+	printTree(root->right, trunk, 1);
+
+	if (!prev) //if prev == NULL
+		strcpy(trunk->str,"---");
+	else if (isLeft)
+	{
+		strcpy(trunk->str,".---");
+		strcpy(prev_str,"\t  |");
+	}
+	else
+	{
+		strcpy(trunk->str,"`---");
+		strcpy(prev->str,prev_str);
+	}
+
+	showTrunks(trunk);
+	printf(" %s\n",root->token);
+	if (prev)
+		strcpy(prev->str,prev_str);
+	strcpy(trunk->str,"\t  |");
+
+	printTree(root->left, trunk, 0);
+}
+
 void printtree(Node *tree)
 {
 	int i;
@@ -951,57 +1000,8 @@ void printtree(Node *tree)
 	if (tree->left || tree->right)
 		printf(")");
 }
-int get_levels(Node *root, int level)
-{
-	root->level = level;
-	if(root->left == NULL && root->right == NULL)
-	{
-		return level;
-	}
-	int m, m1, m2;
-	if(root->left == NULL)
-	{
-		m = get_levels(root->right, level+1);
-	}
-	else if(root->right == NULL)
-	{
-		m = get_levels(root->left, level+1);
-	}
-	else
-	{
-		m1 = get_levels(root->left, level+1);
-		m2 = get_levels(root->right, level+1);
-		if(m1>m2)
-			m = m1;
-		else
-			m=m2;
-	}
-	return m;
-}
 
-int getmaxlevel(Node *root)
-{
-	return get_levels(root, 1);
-}
-void displaytree(Node* root)
-{
-    int h = getmaxlevel(root)+2;
-	printf("\n max lev= %d\n",h);
-    int i;
 
-		printf("\n\n ͟A͟b͟s͟t͟r͟a͟c͟t͟ ͟S͟y͟n͟t͟a͟x͟ ͟T͟r͟e͟e͟ \n\n");
-    for (i=1; i<=h; i++)
-    {
-			  printf("");
-				for(int j=0;j<=h+1-i;j++)
-				{
-					printf("     ");
-				}
-        printGivenLevel(root, i,h);
-        printf("\n\n\n");
-
-    }
-}
 
 void printICG(quad *q)
 {
@@ -1013,29 +1013,6 @@ void printICG(quad *q)
 	printf("\n\t ____________________________________________________\n\n");
 }
 
-
-void printGivenLevel(Node* root, int level, int h)
-{
-    if (root == NULL)
-        return;
-    if (level == 1)
-		{
-			for(int j=0;j<h-4-level;j++)
-			{
-					printf(" ");
-			}
-	        printf("%s", root->token);
-		}
-    else if (level > 1)
-    {
-        printGivenLevel(root->left, level-1,h);
-				for(int j=0;j<h-4-level;j++)
-				{
-						printf(" ");
-				}
-        printGivenLevel(root->right, level-1,h);
-    }
-}
 
 symbol_table* initialize()
 {
@@ -1462,7 +1439,8 @@ int main()
 	display(st);
 	//Display AST
 	printtree(root);
-	displaytree(root);
+	printf("\n");
+	printTree(root, NULL, 0);
 	//Display IC
 	printICG(q);
 	fclose(yyin);

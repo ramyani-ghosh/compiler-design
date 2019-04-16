@@ -4,6 +4,7 @@
 #include <string.h>
 #define COUNT 10
 int curr_scope = 0;
+int insideloop = 0;
 int opening_brackets = 0;
 int closing_brackets = 0;
 int nesting = 0;
@@ -58,6 +59,11 @@ typedef struct quad
 		char arg2;
 		char res;
 }quad;
+typedef struct Trunk
+{
+	struct Trunk *prev;
+	char str[100];
+}Trunk;
 
 
 int get_levels(Node *root, int level);
@@ -83,6 +89,9 @@ void set_arr();
 void unset_arr();
 void printtree(Node *tree);
 void displaytree(Node *tree);
+void printTree(Node* root, Trunk*,int);
+void showTrunks(Trunk *p);
+
 int getmaxlevel(Node *root);
 void printGivenLevel(Node* root, int level, int h);
 void printICG(quad *q);
@@ -126,24 +135,28 @@ char *wrong_symbol;
 %%
 
 primary_expression
-	: IDENTIFIER	{ strcpy($$, $1); exists($1); create_node($1, 1);}
+	: IDENTIFIER	{ strcpy($$, $1); create_node($1, 1);exists($1);}
     | CHAR_CONSTANT		{ strcpy($$, $1); create_node($1, 1);}
 	| FLOAT_CONSTANT	{ strcpy($$, $1); create_node($1, 1);}
     | CONSTANT          { strcpy($$, $1); create_node($1, 1);}
     | INT_CONSTANT		{ strcpy($$, $1); create_node($1, 1);}
-	| STRING_LITERAL	{}
+	| STRING_LITERAL	{ strcpy($$, $1); create_node($1, 1);}
 	| '(' expression ')'	{}
 	;
 
 postfix_expression
 	: primary_expression	{ strcpy($$, $1); }
 	| postfix_expression '[' expression ']'	{
+												pop_tree();
+												pop_tree();
 												char s[30];
 												strcpy(s, $1);
 												strcat(s, "[");
 												strcat(s, $3);
 												strcat(s, "]");
+												create_node(s, 1);
 												strcpy($$, s);
+
 											}
 	| postfix_expression '(' ')'	{}
 	| postfix_expression '(' argument_expression_list ')'	{}
@@ -660,12 +673,27 @@ identifier_list
 
 initializer
 	: assignment_expression	{ strcpy($$, $1); }
-	| '{' initializer_list '}'	{ 	char s[20] = "{";
+	| '{' initializer_list '}'	{
+									char s[20] = "{";
 									strcat(s, $2);
 									strcat(s, "}");
 									strcpy($$, s);
+									for(int i=0; s[i]!='}'; i++)
+									{
+										Node *n;
+										if(s[i]==',')
+											n=pop_tree();
+									}
+									pop_tree();
+									create_node(s, 1);
 								}
-	| '{' initializer_list ',' '}'	{}
+	| '{' initializer_list ',' '}'	{
+										char s[20] = "{";
+										strcat(s, $2);
+										strcat(s, ",}");
+										strcpy($$, s);
+										create_node(s, 1);
+									}
 	;
 
 initializer_list
@@ -726,7 +754,7 @@ init_declarator
 										create_node("=", 0);
 										char val[20];
 										strcpy(val, $3);
-										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'')
+										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'' || $3[0]== '"')
 										{
 											tempval($1, val, 0, 1);
 											strcpy($$,$1);
@@ -755,12 +783,20 @@ type_specifier
 	;
 
 declarator
-	: IDENTIFIER            {create_node($1, 1); strcpy($$,$1);}
+	: IDENTIFIER            { create_node($1, 1); strcpy($$,$1);}
 	/* | '(' declarator ')' */
-	| declarator '[' INT_CONSTANT ']' { tempval($1, "{0}", 1, atoi($3)); strcpy($$, $1); }
+	| declarator '[' INT_CONSTANT ']' {
+										Node * n= pop_tree();
+										char s[30] = "";
+										strcat(s, $1);
+										strcat(s,"[");
+										strcat(s, $3);
+										strcat(s, "]");
+										create_node(s, 1);
+										tempval($1, "{0}", 1, atoi($3)); strcpy($$, $1); }
 	| declarator '(' parameter_list ')'	{}
 	| declarator '(' identifier_list ')'	{}
-	| declarator '(' ')'	{strcpy($$, $1);}
+	| declarator '(' ')'	{strcpy($$, $1); }
 	;
 
 statement_list
@@ -779,14 +815,20 @@ selection_statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' compound_statement {create_node("while", 0);}
-	| DO compound_statement WHILE '(' expression ')' ';' {create_node("do-while", 0);}
+	: WHILE '(' expression ')' {insideloop = 1; } compound_statement { insideloop = 0; create_node("while", 0);}
+	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
 	;
 
 
 jump_statement
 	: CONTINUE ';'	{}
-	| BREAK ';'	{}
+	| BREAK ';'		{
+						if(!insideloop)
+						{
+							printf("\n%*s\n%*s   <--- break statement not within loop \n", column, "^", column, wrong_symbol);
+							exit(0);
+						}
+					}
 	| RETURN ';'	{ create_node("return",1);}
 	| RETURN expression ';'	{ char s[20] = "return ";
 							  strcat(s, $2);
@@ -809,7 +851,7 @@ external_declaration
 	;
 
 function_definition
-	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function"); pop_tree_2();}
+	: type_specifier declarator compound_statement	{}	{ lookup($2, $1, "function"); }
 	| declarator declaration compound_statement {}
 	| declarator compound_statement	{}
 	;
@@ -904,6 +946,56 @@ Node* pop_tree_2()
 	free(temp);
 	return retnode;
 }
+
+
+// Helper function to print branches of the binary tree
+void showTrunks(Trunk *p)
+{
+	if (p == NULL)
+		return;
+
+	showTrunks(p->prev);
+
+	printf("%s",p->str);
+}
+
+// Recursive function to print binary tree
+// It uses inorder traversal
+void printTree(Node *root, Trunk *prev, int isLeft)
+{
+	if (root == NULL)
+		return;
+
+	char prev_str[100] = "	  ";
+	Trunk *trunk = (Trunk*)malloc(sizeof(Trunk));
+	trunk->prev = prev;
+	strcpy(trunk->str, prev_str);
+
+	printTree(root->right, trunk, 1);
+
+	if (!prev) //if prev == NULL
+		strcpy(trunk->str,"---");
+	else if (isLeft)
+	{
+		strcpy(trunk->str,".---");
+		strcpy(prev_str,"\t  |");
+	}
+	else
+	{
+		strcpy(trunk->str,"`---");
+		strcpy(prev->str,prev_str);
+	}
+
+	showTrunks(trunk);
+	printf(" %s\n",root->token);
+	if (prev)
+		strcpy(prev->str,prev_str);
+	strcpy(trunk->str,"\t  |");
+
+	printTree(root->left, trunk, 0);
+}
+
+
 void printtree(Node *tree)
 {
 	int i;
@@ -952,13 +1044,12 @@ int getmaxlevel(Node *root)
 void displaytree(Node* root)
 {
     int h = getmaxlevel(root)+2;
-	printf("\n max lev= %d\n",h);
     int i;
 
 		printf("\n\n ͟A͟b͟s͟t͟r͟a͟c͟t͟ ͟S͟y͟n͟t͟a͟x͟ ͟T͟r͟e͟e͟ \n\n");
     for (i=1; i<=h; i++)
     {
-			  printf("\t");
+			  printf("");
 				for(int j=0;j<=h+1-i;j++)
 				{
 					printf("     ");
@@ -986,16 +1077,16 @@ void printGivenLevel(Node* root, int level, int h)
         return;
     if (level == 1)
 		{
-			for(int j=0;j<=h-1-level;j++)
+			for(int j=0;j<h-4-level;j++)
 			{
 					printf(" ");
 			}
-	        printf("%s ", root->token);
+	        printf("%s", root->token);
 		}
     else if (level > 1)
     {
         printGivenLevel(root->left, level-1,h);
-				for(int j=0;j<=h-1-level;j++)
+				for(int j=0;j<h-4-level;j++)
 				{
 						printf(" ");
 				}
@@ -1427,8 +1518,11 @@ int main()
 	//Display symbol table
 	display(st);
 	//Display AST
+	// displaytree(root);
 	printtree(root);
-	displaytree(root);
+	printf("\n");
+	printTree(root, NULL, 0);
+
 	//Display IC
 	printICG(q);
 	fclose(yyin);
