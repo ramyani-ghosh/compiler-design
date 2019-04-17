@@ -1,7 +1,19 @@
 #include<stdio.h>
 void main()
 {
-    int x[3]={1,2,3};
+    int a=10;
+    int b=5;
+    int c=a+b;
+    int x= a/ b+b;
+    if(x<c)
+    {
+        a=a+10;
+    }
+    else
+    {
+        a=a-10;
+    }
+  /* int x[3]={1,2,3};
     x[1] = 4;
     do
     {
@@ -14,5 +26,5 @@ void main()
             int b;
         }
     }while(x<2);
-
+*/
 }
