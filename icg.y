@@ -9,6 +9,13 @@ int opening_brackets = 0;
 int closing_brackets = 0;
 int nesting = 0;
 int Index=0;
+int tIndex = 0;
+
+int L = 0;
+int whileStack[100];
+int whileTop = 0;
+int ifStack[100];
+int ifTop = 0;
 
 typedef struct Node{
 	struct Node *left;
@@ -29,6 +36,8 @@ typedef struct quad
 	char arg1[10];
 	char arg2[10];
 	char result[10];
+	int scope;
+	int mark;
 }quad;
 
 quad QUAD[30];
@@ -81,6 +90,17 @@ typedef struct Trunk
 }Trunk;
 
 
+typedef struct variableVals
+{
+	char var[50];
+	char val[50];
+	int scope;
+	struct variableVals *next;
+}variableVals;
+
+variableVals *varvals = NULL;
+
+
 void push_scope(int);
 void pop_scope();
 int peep_scope();
@@ -103,7 +123,10 @@ void set_arr();
 void unset_arr();
 void showTrunks(Trunk *p);
 void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10]);
-void printICG(quad *q);
+void printICG();
+void optimizeICG();
+char* checkVal(char *s, int scope);
+void addVal(char *s, char *val, int scope);
 
 extern char yytext[];
 extern int line_number;
@@ -649,12 +672,12 @@ conditional_expression
 assignment_expression
 	: conditional_expression	{ strcpy($$, $1); }
 	| unary_expression assignment_operator assignment_expression	{
-																		addval($1, $3, curr_scope);
-
+																		// addval($1, $3, curr_scope);
 																		strcpy(QUAD[Index].op,"=");
 																		strcpy(QUAD[Index].arg1,$3);
 																		strcpy(QUAD[Index].arg2,"");
 																		strcpy(QUAD[Index].result,$1);
+																		QUAD[Index].scope = curr_scope;
 																		strcpy($$,QUAD[Index++].result);
 
 																		create_node("=", 0);
@@ -803,6 +826,12 @@ init_declarator
 											tempval($1, val, 0, 1);
 											strcpy($$,$1);
 										}
+										strcpy(QUAD[Index].op,"=");
+										strcpy(QUAD[Index].arg1,$3);
+										strcpy(QUAD[Index].arg2,"");
+										strcpy(QUAD[Index].result,$1);
+										QUAD[Index].scope = curr_scope;
+										strcpy($$,QUAD[Index++].result);
 									}
 	;
 
@@ -843,27 +872,55 @@ expression_statement
 	| expression ';'	{}
 	;
 
-selection_statement
-	: IF '(' expression ')' compound_statement {
-																										create_node("if", 0);
-																										strcpy($$,$5);
-																										AddQuadruple("if" , $3, " ", $$);
-																								}
-	| IF '(' expression ')' compound_statement ELSE compound_statement{
 
-																										create_node("else", 0);
-																										create_node("if", 0);
-																										strcpy($$,$5);
-																										AddQuadruple("if" , $3, " ", $5);
-																										AddQuadruple("iff" , "goto", " ", $$);
-																									}
+selection_statement
+	: IF '(' expression ')' M compound_statement {
+													create_node("if", 0);
+													AddQuadruple("Label" ,"iffalse", "onlyif", "");
+												 }
+
+	| IF '(' expression ')' M compound_statement ELSE {
+														AddQuadruple("goto","ifdone","","");
+														AddQuadruple("Label","iffalse","","");
+													 }
+													 compound_statement
+													 {
+														AddQuadruple("Label","ifdone","","");
+														create_node("else", 0);
+														create_node("if", 0);
+													}
 	;
 
+M
+	: /* epsilon */ {
+						AddQuadruple("if", "", "iftrue", "");
+						AddQuadruple("goto","iffalse","","");
+						AddQuadruple("Label","iftrue","","");
+					}
+	;
+
+
 iteration_statement
-	: WHILE '(' expression ')' {insideloop = 1; } compound_statement { insideloop = 0; create_node("while", 0);}
+	: WHILE {
+				AddQuadruple("Label","whilecond","","");
+			}
+	'(' expression ')' whileM {insideloop = 1; } compound_statement {
+																		AddQuadruple("goto","whilecond","","");
+																		AddQuadruple("Label","whilefalse","","");
+																		insideloop = 0;
+																		create_node("while", 0);
+																	}
+
 	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
 	;
 
+whileM
+	: /* epsilon */ {
+						AddQuadruple("if", "", "whiletrue", "");
+						AddQuadruple("goto","whilefalse","","");
+						AddQuadruple("Label","whiletrue","","");
+					}
+	;
 
 jump_statement
 	: CONTINUE ';'	{}
@@ -1002,26 +1059,633 @@ void showTrunks(Trunk *p)
 	printf("%s",p->str);
 }
 
+// selection_statement
+// 	: IF '(' expression ')' M compound_statement {
+// 													create_node("if", 0);
+// 													AddQuadruple("Label" ,"iffalse", "onlyif", "");
+// 												 }
+//
+// 	| IF '(' expression ')' M compound_statement ELSE {
+// 														AddQuadruple("goto","ifdone","","");
+// 														AddQuadruple("Label","iffalse","","");
+// 													 }
+// 													 compound_statement
+// 													 {
+// 														AddQuadruple("Label","ifdone","","");
+// 														create_node("else", 0);
+// 														create_node("if", 0);
+// 													}
+// 	;
+//
+// M
+// 	: /* epsilon */ {
+// 						AddQuadruple("if", "", "iftrue", "");
+// 						AddQuadruple("goto","iffalse","","");
+// 						AddQuadruple("Label","iftrue","","");
+// 					}
+// 	;
+//
+//
+// iteration_statement
+// 	: WHILE {
+// 				AddQuadruple("Label","whilecond","","");
+// 			}
+// 	'(' expression ')' whileM {insideloop = 1; } compound_statement {
+// 																		AddQuadruple("goto","whilecond","","");
+// 																		AddQuadruple("Label","whilefalse","","");
+// 																		insideloop = 0;
+// 																		create_node("while", 0);
+// 																	}
+//
+// 	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
+// 	;
+//
+// whileM
+// 	: /* epsilon */ {
+// 						AddQuadruple("if", "", "whiletrue", "");
+// 						AddQuadruple("goto","whilefalse","","");
+// 						AddQuadruple("Label","whiletrue","","");
+// 					}
+// 	;
 void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 {
 	strcpy(QUAD[Index].op,op);
 	strcpy(QUAD[Index].arg1,arg1);
 	strcpy(QUAD[Index].arg2,arg2);
+	QUAD[Index].scope = curr_scope;
+	QUAD[Index].mark = 0;
+	if(strcmp(op, "if")==0)
+	{
+		sprintf(QUAD[Index].arg1, "t%d", tIndex-1);
+		if(strcmp(arg2, "iftrue")==0)
+		{
+			ifStack[ifTop++] = L;
+		}
+		else if(strcmp(arg2, "whiletrue")==0)
+		{
+			whileStack[whileTop++] = L;
+		}
+		strcpy(QUAD[Index].arg2,"");
+		sprintf(QUAD[Index++].result,"L%d",L++);
+	}
+	else if(strcmp(op, "goto")==0)
+	{
+		if(strcmp(arg1, "iffalse")==0 || strcmp(arg1, "ifdone")==0)
+		{
+			ifStack[ifTop++] = L;
+			sprintf(QUAD[Index].result,"L%d",L++);
+		}
+		else if(strcmp(arg1, "whilefalse")==0)
+		{
+			whileStack[whileTop++] = L;
+			sprintf(QUAD[Index].result,"L%d",L++);
+		}
+		else if(strcmp(arg1, "whilecond")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d",whileStack[whileTop-3]);
+		}
+		strcpy(QUAD[Index].arg1,"");
+		strcpy(QUAD[Index++].arg2,"");
+	}
+	else if(strcmp(op, "Label")==0)
+	{
+		if(strcmp(arg1, "iffalse")== 0 && strcmp(arg2, "onlyif")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", ifStack[ifTop-1]);
+			ifTop = ifTop -2;
+		}
+		else if((strcmp(arg1, "iftrue")==0) || (strcmp(arg1, "iffalse")==0))
+		{
+			sprintf(QUAD[Index].result,"L%d", ifStack[ifTop-2]);
+		}
+		else if(strcmp(arg1, "ifdone")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", ifStack[ifTop-1]);
+			ifTop = ifTop - 3;
+		}
+		else if(strcmp(arg1, "whilecond")==0)
+		{
+			whileStack[whileTop++] = L;
+			sprintf(QUAD[Index].result,"L%d", L++);
+		}
+		else if(strcmp(arg1, "whiletrue")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", whileStack[whileTop-2]);
+		}
+		else if(strcmp(arg1, "whilefalse")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", whileStack[whileTop-1]);
+			whileTop = whileTop -3;
+		}
+		strcpy(QUAD[Index].arg1,"");
+		strcpy(QUAD[Index++].arg2,"");
+	}
+	else
+	{
+		sprintf(QUAD[Index].result,"t%d",tIndex++);
+		lookup(QUAD[Index].result, "int", "temporary");
+		strcpy(result,QUAD[Index++].result);
+	}
 
-	sprintf(QUAD[Index].result,"t%d",Index++);
-	strcpy(result,QUAD[Index++].result);
 }
 
-void printICG(quad *q)
+void addVal(char *s, char *val, int scope)
+{
+	variableVals *temp = (variableVals*)malloc(sizeof(variableVals));
+	strcpy(temp->var, s);
+	int digit = val[0] - '0';
+	if(digit>= 0 && digit<=9)
+	{
+		strcpy(temp->val, val);
+	}
+	else
+	{
+		strcpy(temp->val, checkVal(s,scope));
+	}
+	temp->next=NULL;
+	temp->scope = scope;
+	if(varvals == NULL)
+	{
+		varvals = temp;
+		return;
+	}
+	variableVals *t = varvals;
+	while(t->next!=NULL)
+	{
+		if(strcmp(t->var, temp->var)==0 && t->scope == temp->scope)
+		{
+			strcpy(t->val,temp->val);
+			free(temp);
+			return;
+		}
+		t=t->next;
+	}
+	t->next= temp;
+}
+
+char* checkVal(char *s, int scope)
+{
+	variableVals *temp = varvals;
+	while(temp!=NULL)
+	{
+		if(strcmp(temp->var, s)==0 && temp->scope == scope)
+		{
+			return temp->val;
+		}
+		temp = temp->next;
+	}
+	return s;
+}
+void optimizeICG()
+{
+	for(int i=0; i<Index; i++)
+	{
+		if(strcmp(QUAD[i].op, "=") == 0)
+		{
+			int d = QUAD[i].arg1[0]- '0';
+			if(d>=0 && d<=9)
+			{
+				addVal(QUAD[i].result, QUAD[i].arg1, QUAD[i].scope);
+				variableVals *temp = varvals;
+				while(temp!=NULL)
+				{
+					temp = temp->next;
+				}
+			}
+			else
+			{
+				char retval[50];
+				strcpy(retval, checkVal(QUAD[i].arg1, QUAD[i].scope));
+				addVal(QUAD[i].result, QUAD[i].arg1, QUAD[i].scope);
+				strcpy(QUAD[i].arg1, retval);
+			}
+		}
+		else if(strcmp(QUAD[i].op, "+") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) + atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) + atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) + atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) + atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "-") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) - atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) - atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) - atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) - atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "*") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) * atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) * atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) * atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) * atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "/") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) / atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) / atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) / atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) / atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "==") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) == atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) == atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) == atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) == atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "&&") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) && atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) && atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) && atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) && atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "||") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) || atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) || atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) || atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) || atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "<") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) < atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) < atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) < atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) < atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, ">") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) > atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) > atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) > atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) > atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "<=") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) <= atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) <= atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) <= atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) <= atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, ">=") == 0)
+		{
+			int d1 = QUAD[i].arg1[0] - '0';
+			int d2 = QUAD[i].arg2[0] - '0';
+			char retval[50];
+			if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) >= atoi(QUAD[i].arg2);
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d1>=0 && d1<=9)
+			{
+				int sum = atoi(QUAD[i].arg1) >= atoi(checkVal(QUAD[i].arg2, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else if(d2>=0 && d2<=9)
+			{
+				int sum = atoi(QUAD[i].arg2) >= atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			else
+			{
+				int sum = atoi(checkVal(QUAD[i].arg2, QUAD[i].scope)) >= atoi(checkVal(QUAD[i].arg1, QUAD[i].scope));
+				snprintf(retval, 10, "%d", sum);
+				addVal(QUAD[i].result, retval, QUAD[i].scope);
+			}
+			strcpy(QUAD[i].op, "=");
+			strcpy(QUAD[i].arg1, retval);
+			strcpy(QUAD[i].arg2, "");
+			if(QUAD[i].result[0]=='t')
+			{
+				QUAD[i].mark = 1;
+			}
+		}
+		else if(strcmp(QUAD[i].op, "if")==0)
+		{
+			strcpy(QUAD[i].arg1, checkVal(QUAD[i].arg1, QUAD[i].scope));
+		}
+
+	}
+}
+
+void printICG()
 {
 		printf("\n\n ͟I͟n͟t͟e͟r͟m͟e͟d͟i͟a͟t͟e͟ ͟C͟o͟d͟e͟\n\n");
 		int i;
     printf("\nThree Address Code Quadruple\n");
-    printf("\n\t%s\t|\t%s\t|\t%s\t|\t%s\t|\t%s","pos","op","arg1","arg2","result");
+    printf("\n\t%s\t|\t%s\t|\t%s\t|\t%s\t|\t%s\t\tscope","pos","op","arg1","arg2","result");
     printf("\n\t-----------------------------------------------------------------------");
     for(i=0;i<Index;i++)
     {
-      printf("\n\t%d\t|\t%s\t|\t%s\t|\t%s\t|\t%s", i,QUAD[i].op, QUAD[i].arg1,QUAD[i].arg2,QUAD[i].result);
+		if(QUAD[i].mark!=1)
+      		printf("\n\t%d\t|\t%s\t|\t%s\t|\t%s\t|\t%s\t\t%d", i,QUAD[i].op, QUAD[i].arg1,QUAD[i].arg2,QUAD[i].result, QUAD[i].scope);
     }
 
     printf("\n\n");
@@ -1413,8 +2077,7 @@ yyerror(s)
 char *s;
 {
 	fflush(stdout);
-
-		printf("\n%*s\n%*s\n", column, "^", column, s);
+	printf("\n%*s\n%*s\n", column, "^", column, s);
 
 
 }
@@ -1447,12 +2110,14 @@ int main()
 	struct Node *root;
 	yyparse();
 	root = pop_tree();
-	quad *q;
 
 	//Display symbol table
 	display(st);
 	//Display IC
-	printICG(q);
+	printICG();
+	optimizeICG();
+
+	printICG();
 	fclose(yyin);
 
 }

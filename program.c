@@ -3,16 +3,20 @@ void main()
 {
     int a=10;
     int b=5;
+    int x = 1;
     int c=a+b;
-    int x= a/ b+b;
-    if(x<c)
+    if(x>c)
     {
-        a=a+10;
+        while(a==b)
+        {
+            int p=9;
+        }
     }
     else
     {
-        a=a-10;
+        int q=0;
     }
+
   /* int x[3]={1,2,3};
     x[1] = 4;
     do
