@@ -81,6 +81,8 @@ int whileStack[100];
 int whileTop = 0;
 int ifStack[100];
 int ifTop = 0;
+int doStack[100];
+int doTop = 0;
 
 typedef struct Node{
 	struct Node *left;
@@ -208,7 +210,7 @@ char *wrong_symbol;
 
 
 
-#line 212 "y.tab.c" /* yacc.c:339  */
+#line 214 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -328,12 +330,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 148 "icg.y" /* yacc.c:355  */
+#line 150 "icg.y" /* yacc.c:355  */
 
 	int ival;
 	char string[128];
 
-#line 337 "y.tab.c" /* yacc.c:355  */
+#line 339 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -350,7 +352,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 354 "y.tab.c" /* yacc.c:358  */
+#line 356 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -651,19 +653,19 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   171,   171,   172,   173,   174,   175,   176,   177,   181,
-     182,   194,   195,   196,   197,   218,   242,   243,   247,   248,
-     269,   289,   290,   291,   295,   296,   297,   298,   299,   300,
-     304,   305,   331,   358,   387,   388,   414,   443,   444,   471,
-     498,   525,   554,   555,   581,   610,   611,   639,   640,   668,
-     669,   673,   674,   688,   689,   690,   691,   692,   693,   698,
-     699,   706,   707,   711,   712,   716,   719,   724,   725,   739,
-     749,   750,   760,   761,   762,   763,   764,   765,   770,   770,
-     782,   783,   787,   800,   801,   809,   810,   839,   840,   841,
-     842,   843,   844,   845,   849,   851,   860,   861,   862,   866,
-     867,   871,   872,   877,   882,   882,   895,   904,   907,   904,
-     914,   914,   918,   926,   927,   934,   935,   941,   942,   946,
-     947,   951,   952,   956,   956,   957,   958
+       0,   173,   173,   174,   175,   176,   177,   178,   179,   183,
+     184,   196,   197,   198,   199,   222,   248,   249,   253,   254,
+     276,   297,   298,   299,   303,   304,   305,   306,   307,   308,
+     312,   313,   339,   366,   395,   396,   422,   451,   452,   479,
+     506,   533,   562,   563,   589,   618,   619,   648,   649,   678,
+     679,   683,   684,   824,   825,   826,   827,   828,   829,   834,
+     835,   842,   843,   847,   848,   852,   855,   860,   861,   875,
+     885,   886,   896,   897,   898,   899,   900,   901,   906,   906,
+     918,   919,   923,   936,   937,   945,   946,  1040,  1041,  1042,
+    1043,  1044,  1045,  1046,  1050,  1052,  1061,  1062,  1063,  1067,
+    1068,  1072,  1073,  1078,  1083,  1083,  1096,  1105,  1108,  1105,
+    1115,  1115,  1126,  1134,  1135,  1142,  1143,  1149,  1150,  1154,
+    1155,  1159,  1160,  1164,  1164,  1165,  1166
 };
 #endif
 
@@ -1645,58 +1647,58 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 171 "icg.y" /* yacc.c:1646  */
+#line 173 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);exists((yyvsp[0].string)); }
-#line 1651 "y.tab.c" /* yacc.c:1646  */
+#line 1653 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 172 "icg.y" /* yacc.c:1646  */
+#line 174 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);}
-#line 1657 "y.tab.c" /* yacc.c:1646  */
+#line 1659 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 173 "icg.y" /* yacc.c:1646  */
+#line 175 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);}
-#line 1663 "y.tab.c" /* yacc.c:1646  */
+#line 1665 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 174 "icg.y" /* yacc.c:1646  */
+#line 176 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);}
-#line 1669 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 175 "icg.y" /* yacc.c:1646  */
+#line 177 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);}
-#line 1675 "y.tab.c" /* yacc.c:1646  */
+#line 1677 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 176 "icg.y" /* yacc.c:1646  */
+#line 178 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); create_node((yyvsp[0].string), 1);}
-#line 1681 "y.tab.c" /* yacc.c:1646  */
+#line 1683 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 177 "icg.y" /* yacc.c:1646  */
+#line 179 "icg.y" /* yacc.c:1646  */
     {}
-#line 1687 "y.tab.c" /* yacc.c:1646  */
+#line 1689 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 181 "icg.y" /* yacc.c:1646  */
+#line 183 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 1693 "y.tab.c" /* yacc.c:1646  */
+#line 1695 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 182 "icg.y" /* yacc.c:1646  */
+#line 184 "icg.y" /* yacc.c:1646  */
     {
-												pop_tree();
-												pop_tree();
+												/* pop_tree();
+												pop_tree(); */
 												char s[30];
 												strcpy(s, (yyvsp[-3].string));
 												strcat(s, "[");
@@ -1706,32 +1708,32 @@ yyreduce:
 												strcpy((yyval.string), s);
 
 											}
-#line 1710 "y.tab.c" /* yacc.c:1646  */
+#line 1712 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 194 "icg.y" /* yacc.c:1646  */
+#line 196 "icg.y" /* yacc.c:1646  */
     {}
-#line 1716 "y.tab.c" /* yacc.c:1646  */
+#line 1718 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 195 "icg.y" /* yacc.c:1646  */
+#line 197 "icg.y" /* yacc.c:1646  */
     {}
-#line 1722 "y.tab.c" /* yacc.c:1646  */
+#line 1724 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 196 "icg.y" /* yacc.c:1646  */
+#line 198 "icg.y" /* yacc.c:1646  */
     { exists((yyvsp[0].string));}
-#line 1728 "y.tab.c" /* yacc.c:1646  */
+#line 1730 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 197 "icg.y" /* yacc.c:1646  */
+#line 199 "icg.y" /* yacc.c:1646  */
     {
 
-		int d1 = (yyvsp[-1].string)[0] - '0';
+		/* int d1 = $1[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -1739,25 +1741,27 @@ yyreduce:
 		}
 		else
 		{
-			int s = atoi(get_val((yyvsp[-1].string), curr_scope)) + 1;
+			int s = atoi(get_val($1, curr_scope)) + 1;
 			char str[10];
 			// printf("%d", s);
 			snprintf(str, 10, "%d", s);
-			addval((yyvsp[-1].string), str, curr_scope);
+			addval($1, str, curr_scope);
 		}
 
 		create_node("1",1);
-		create_node("+", 0);
+		create_node("+", 0); */
+
+		AddQuadruple("+", (yyvsp[-1].string), "1", (yyval.string));
 
 	}
-#line 1754 "y.tab.c" /* yacc.c:1646  */
+#line 1758 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 218 "icg.y" /* yacc.c:1646  */
+#line 222 "icg.y" /* yacc.c:1646  */
     {
 
-		int d1 = (yyvsp[-1].string)[0] - '0';
+		/* int d1 = $1[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -1765,43 +1769,45 @@ yyreduce:
 		}
 		else
 		{
-			int s = atoi(get_val((yyvsp[-1].string), curr_scope)) - 1;
+			int s = atoi(get_val($1, curr_scope)) - 1;
 			char str[10];
 			// printf("%d", s);
 			snprintf(str, 10, "%d", s);
-			addval((yyvsp[-1].string), str, curr_scope);
+			addval($1, str, curr_scope);
 		}
 
 		create_node("1",1);
-		create_node("-", 0);
+		create_node("-", 0); */
+
+		AddQuadruple("-", (yyvsp[-1].string), "1", (yyval.string));
 
 	}
-#line 1780 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 16:
-#line 242 "icg.y" /* yacc.c:1646  */
-    {}
 #line 1786 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 17:
-#line 243 "icg.y" /* yacc.c:1646  */
+  case 16:
+#line 248 "icg.y" /* yacc.c:1646  */
     {}
 #line 1792 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 18:
-#line 247 "icg.y" /* yacc.c:1646  */
-    { strcpy((yyval.string), (yyvsp[0].string)); }
+  case 17:
+#line 249 "icg.y" /* yacc.c:1646  */
+    {}
 #line 1798 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 18:
+#line 253 "icg.y" /* yacc.c:1646  */
+    { strcpy((yyval.string), (yyvsp[0].string)); }
+#line 1804 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 19:
-#line 248 "icg.y" /* yacc.c:1646  */
+#line 254 "icg.y" /* yacc.c:1646  */
     {
 
-		int d1 = (yyvsp[0].string)[0] - '0';
+		/* int d1 = $2[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -1809,25 +1815,26 @@ yyreduce:
 		}
 		else
 		{
-			int s = atoi(get_val((yyvsp[0].string), curr_scope)) + 1;
+			int s = atoi(get_val($2, curr_scope)) + 1;
 			char str[10];
 			// printf("%d", s);
 			snprintf(str, 10, "%d", s);
-			addval((yyvsp[0].string), str, curr_scope);
+			addval($2, str, curr_scope);
 		}
 
 		create_node("1",1);
-		create_node("+", 0);
+		create_node("+", 0); */
+		AddQuadruple("+", (yyvsp[0].string), "1", (yyval.string));
 
 	}
-#line 1824 "y.tab.c" /* yacc.c:1646  */
+#line 1831 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 269 "icg.y" /* yacc.c:1646  */
+#line 276 "icg.y" /* yacc.c:1646  */
     {
 
-		int d1 = (yyvsp[0].string)[0] - '0';
+		/* int d1 = $2[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -1835,345 +1842,346 @@ yyreduce:
 		}
 		else
 		{
-			int s = atoi(get_val((yyvsp[0].string), curr_scope)) - 1;
+			int s = atoi(get_val($2, curr_scope)) - 1;
 			char str[10];
 			// printf("%d", s);
 			snprintf(str, 10, "%d", s);
-			addval((yyvsp[0].string), str, curr_scope);
+			addval($2, str, curr_scope);
 		}
 		create_node("1",1);
-		create_node("-", 0);
+		create_node("-", 0); */
+		AddQuadruple("-", (yyvsp[0].string), "1", (yyval.string));
 
 	}
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1857 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 289 "icg.y" /* yacc.c:1646  */
+#line 297 "icg.y" /* yacc.c:1646  */
     {}
-#line 1855 "y.tab.c" /* yacc.c:1646  */
+#line 1863 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 290 "icg.y" /* yacc.c:1646  */
+#line 298 "icg.y" /* yacc.c:1646  */
     {}
-#line 1861 "y.tab.c" /* yacc.c:1646  */
+#line 1869 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 291 "icg.y" /* yacc.c:1646  */
+#line 299 "icg.y" /* yacc.c:1646  */
     {}
-#line 1867 "y.tab.c" /* yacc.c:1646  */
+#line 1875 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 295 "icg.y" /* yacc.c:1646  */
+#line 303 "icg.y" /* yacc.c:1646  */
     {}
-#line 1873 "y.tab.c" /* yacc.c:1646  */
+#line 1881 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 296 "icg.y" /* yacc.c:1646  */
+#line 304 "icg.y" /* yacc.c:1646  */
     {}
-#line 1879 "y.tab.c" /* yacc.c:1646  */
+#line 1887 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 297 "icg.y" /* yacc.c:1646  */
+#line 305 "icg.y" /* yacc.c:1646  */
     {}
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1893 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 298 "icg.y" /* yacc.c:1646  */
+#line 306 "icg.y" /* yacc.c:1646  */
     {}
-#line 1891 "y.tab.c" /* yacc.c:1646  */
+#line 1899 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 299 "icg.y" /* yacc.c:1646  */
+#line 307 "icg.y" /* yacc.c:1646  */
     {}
-#line 1897 "y.tab.c" /* yacc.c:1646  */
+#line 1905 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 300 "icg.y" /* yacc.c:1646  */
+#line 308 "icg.y" /* yacc.c:1646  */
     {}
-#line 1903 "y.tab.c" /* yacc.c:1646  */
+#line 1911 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 304 "icg.y" /* yacc.c:1646  */
+#line 312 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 1909 "y.tab.c" /* yacc.c:1646  */
+#line 1917 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 305 "icg.y" /* yacc.c:1646  */
+#line 313 "icg.y" /* yacc.c:1646  */
     {
-															create_node("*", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("*", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) * atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) * atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) * atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) * atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) * atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) * atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) * atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) * atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("*" , (yyvsp[-2].string), (yyvsp[0].string), (yyval.string));
 														}
-#line 1940 "y.tab.c" /* yacc.c:1646  */
+#line 1948 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 331 "icg.y" /* yacc.c:1646  */
+#line 339 "icg.y" /* yacc.c:1646  */
     {
-															create_node("/", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("/", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) / atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) / atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) / atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) / atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) / atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) / atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) / atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) / atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("/" , (yyvsp[-2].string), (yyvsp[0].string), (yyval.string));
 
 														}
-#line 1972 "y.tab.c" /* yacc.c:1646  */
+#line 1980 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 358 "icg.y" /* yacc.c:1646  */
+#line 366 "icg.y" /* yacc.c:1646  */
     {
-															create_node("%", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("%", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) % atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) % atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) % atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) % atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) % atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) % atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) % atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) % atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("%" , (yyvsp[-2].string), (yyvsp[0].string), (yyval.string));
 														}
-#line 2003 "y.tab.c" /* yacc.c:1646  */
+#line 2011 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 387 "icg.y" /* yacc.c:1646  */
+#line 395 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2009 "y.tab.c" /* yacc.c:1646  */
+#line 2017 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 388 "icg.y" /* yacc.c:1646  */
+#line 396 "icg.y" /* yacc.c:1646  */
     {
-															create_node("+", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("+", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) + atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) + atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) + atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) + atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) + atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) + atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) + atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) + atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("+" , (yyvsp[-2].string), (yyvsp[0].string), (yyval.string));
 														}
-#line 2040 "y.tab.c" /* yacc.c:1646  */
+#line 2048 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 414 "icg.y" /* yacc.c:1646  */
+#line 422 "icg.y" /* yacc.c:1646  */
     {
-															create_node("-", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("-", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) - atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) - atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) - atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) - atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) - atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) - atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) - atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) - atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("-" , (yyvsp[-2].string), (yyvsp[0].string), (yyval.string));
 														}
-#line 2071 "y.tab.c" /* yacc.c:1646  */
+#line 2079 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 443 "icg.y" /* yacc.c:1646  */
+#line 451 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2077 "y.tab.c" /* yacc.c:1646  */
+#line 2085 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 444 "icg.y" /* yacc.c:1646  */
+#line 452 "icg.y" /* yacc.c:1646  */
     {
 
-															create_node("<", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("<", 0); */
+															/* int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) < atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) < atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) < atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) < atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) < atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) < atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) < atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) < atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 															AddQuadruple("<",(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2109 "y.tab.c" /* yacc.c:1646  */
+#line 2117 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 471 "icg.y" /* yacc.c:1646  */
+#line 479 "icg.y" /* yacc.c:1646  */
     {
-															create_node(">", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node(">", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) > atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) > atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) > atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) > atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) > atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) > atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) > atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) > atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 
 															AddQuadruple(">",(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2141 "y.tab.c" /* yacc.c:1646  */
+#line 2149 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 498 "icg.y" /* yacc.c:1646  */
+#line 506 "icg.y" /* yacc.c:1646  */
     {
-															create_node("<=", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("<=", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) <= atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) <= atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) <= atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) <= atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) <= atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) <= atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) <= atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) <= atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 
 															AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2173 "y.tab.c" /* yacc.c:1646  */
+#line 2181 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 525 "icg.y" /* yacc.c:1646  */
+#line 533 "icg.y" /* yacc.c:1646  */
     {
 															create_node(">=", 0);
 															int d1 = (yyvsp[-2].string)[0] - '0';
@@ -2200,277 +2208,405 @@ yyreduce:
 															}
 																AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2204 "y.tab.c" /* yacc.c:1646  */
+#line 2212 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 554 "icg.y" /* yacc.c:1646  */
+#line 562 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2210 "y.tab.c" /* yacc.c:1646  */
+#line 2218 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 555 "icg.y" /* yacc.c:1646  */
+#line 563 "icg.y" /* yacc.c:1646  */
     {
-															create_node("==", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("==", 0); */
+															/* int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) == atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) == atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) == atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) == atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) == atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) == atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) == atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) == atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 																AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2241 "y.tab.c" /* yacc.c:1646  */
+#line 2249 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 581 "icg.y" /* yacc.c:1646  */
+#line 589 "icg.y" /* yacc.c:1646  */
     {
-															create_node("!=", 0);
-															int d1 = (yyvsp[-2].string)[0] - '0';
-															int d2 = (yyvsp[0].string)[0] - '0';
+															/* create_node("!=", 0);
+															int d1 = $1[0] - '0';
+															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) != atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) != atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d1>=0 && d1<=9)
 															{
-																int s = atoi((yyvsp[-2].string)) != atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi($1) != atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
 															}
 															else if(d2>=0 && d2<=9)
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) != atoi((yyvsp[0].string));
-																snprintf((yyval.string), 10, "%d", s);
+																int s = atoi(get_val($1, curr_scope)) != atoi($3);
+																snprintf($$, 10, "%d", s);
 															}
 															else
 															{
-																int s = atoi(get_val((yyvsp[-2].string), curr_scope)) != atoi(get_val((yyvsp[0].string), curr_scope));
-																snprintf((yyval.string), 10, "%d", s);
-															}
+																int s = atoi(get_val($1, curr_scope)) != atoi(get_val($3, curr_scope));
+																snprintf($$, 10, "%d", s);
+															} */
 																AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 														}
-#line 2272 "y.tab.c" /* yacc.c:1646  */
+#line 2280 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 610 "icg.y" /* yacc.c:1646  */
+#line 618 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2278 "y.tab.c" /* yacc.c:1646  */
+#line 2286 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 611 "icg.y" /* yacc.c:1646  */
+#line 619 "icg.y" /* yacc.c:1646  */
     {
-																create_node("&&", 0);
-																int d1 = (yyvsp[-2].string)[0] - '0';
-																int d2 = (yyvsp[0].string)[0] - '0';
+																/* create_node("&&", 0);
+																int d1 = $1[0] - '0';
+																int d2 = $3[0] - '0';
 																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 																{
-																	int s = atoi((yyvsp[-2].string)) && atoi((yyvsp[0].string));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi($1) && atoi($3);
+																	snprintf($$, 10, "%d", s);
 																}
 																else if(d1>=0 && d1<=9)
 																{
-																	int s = atoi((yyvsp[-2].string)) && atoi(get_val((yyvsp[0].string), curr_scope));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi($1) && atoi(get_val($3, curr_scope));
+																	snprintf($$, 10, "%d", s);
 																}
 																else if(d2>=0 && d2<=9)
 																{
-																	int s = atoi(get_val((yyvsp[-2].string), curr_scope)) && atoi((yyvsp[0].string));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi(get_val($1, curr_scope)) && atoi($3);
+																	snprintf($$, 10, "%d", s);
 																}
 																else
 																{
-																	int s = atoi(get_val((yyvsp[-2].string), curr_scope)) && atoi(get_val((yyvsp[0].string), curr_scope));
-																	snprintf((yyval.string), 10, "%d", s);
-																}
+																	int s = atoi(get_val($1, curr_scope)) && atoi(get_val($3, curr_scope));
+																	snprintf($$, 10, "%d", s);
+																} */
+																AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 															}
-#line 2308 "y.tab.c" /* yacc.c:1646  */
+#line 2317 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 639 "icg.y" /* yacc.c:1646  */
+#line 648 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2314 "y.tab.c" /* yacc.c:1646  */
+#line 2323 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 640 "icg.y" /* yacc.c:1646  */
+#line 649 "icg.y" /* yacc.c:1646  */
     {
-																create_node("||", 0);
-																int d1 = (yyvsp[-2].string)[0] - '0';
-																int d2 = (yyvsp[0].string)[0] - '0';
+																/* create_node("||", 0);
+																int d1 = $1[0] - '0';
+																int d2 = $3[0] - '0';
 																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 																{
-																	int s = atoi((yyvsp[-2].string)) || atoi((yyvsp[0].string));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi($1) || atoi($3);
+																	snprintf($$, 10, "%d", s);
 																}
 																else if(d1>=0 && d1<=9)
 																{
-																	int s = atoi((yyvsp[-2].string)) || atoi(get_val((yyvsp[0].string), curr_scope));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi($1) || atoi(get_val($3, curr_scope));
+																	snprintf($$, 10, "%d", s);
 																}
 																else if(d2>=0 && d2<=9)
 																{
-																	int s = atoi(get_val((yyvsp[-2].string), curr_scope)) || atoi((yyvsp[0].string));
-																	snprintf((yyval.string), 10, "%d", s);
+																	int s = atoi(get_val($1, curr_scope)) || atoi($3);
+																	snprintf($$, 10, "%d", s);
 																}
 																else
 																{
-																	int s = atoi(get_val((yyvsp[-2].string), curr_scope)) || atoi(get_val((yyvsp[0].string), curr_scope));
-																	snprintf((yyval.string), 10, "%d", s);
-																}
+																	int s = atoi(get_val($1, curr_scope)) || atoi(get_val($3, curr_scope));
+																	snprintf($$, 10, "%d", s);
+																} */
+																AddQuadruple((yyvsp[-1].string),(yyvsp[-2].string),(yyvsp[0].string),(yyval.string));
 															}
-#line 2344 "y.tab.c" /* yacc.c:1646  */
+#line 2354 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 668 "icg.y" /* yacc.c:1646  */
+#line 678 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2350 "y.tab.c" /* yacc.c:1646  */
+#line 2360 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 669 "icg.y" /* yacc.c:1646  */
+#line 679 "icg.y" /* yacc.c:1646  */
     {}
-#line 2356 "y.tab.c" /* yacc.c:1646  */
+#line 2366 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 673 "icg.y" /* yacc.c:1646  */
+#line 683 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2362 "y.tab.c" /* yacc.c:1646  */
+#line 2372 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 674 "icg.y" /* yacc.c:1646  */
+#line 684 "icg.y" /* yacc.c:1646  */
     {
 																		// addval($1, $3, curr_scope);
-																		strcpy(QUAD[Index].op,"=");
-																		strcpy(QUAD[Index].arg1,(yyvsp[0].string));
-																		strcpy(QUAD[Index].arg2,"");
-																		strcpy(QUAD[Index].result,(yyvsp[-2].string));
-																		QUAD[Index].scope = curr_scope;
-																		strcpy((yyval.string),QUAD[Index++].result);
+																		int is1array = 0, is2array = 0;
+																		for(int i=0; (yyvsp[0].string)[i]!='\0'; i++)
+																		{
+																			if((yyvsp[0].string)[i]=='[')
+																			{
+																				is2array = 1;
+																				break;
 
-																		create_node("=", 0);
+																			}
+																			else
+																				is2array = 0;
+																		}
+																		for(int i=0; (yyvsp[-2].string)[i]!='\0'; i++)
+																		{
+																			if((yyvsp[-2].string)[i]=='[')
+																			{
+																				is1array = 1;
+																				break;
+																			}
+																			else
+																				is1array = 0;
+																		}
+																		if(is1array && is2array)
+																		{
+																			char var2[50] = "";
+																			char ind2[50] = "";
+																			int i;
+																			for(i=0; (yyvsp[0].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[0].string)[i]=='[')
+																				{
+																					break;
+																				}
+																				var2[i] = (yyvsp[0].string)[i];
+																			}
+																			var2[i] = '\0';
+																			int j=i;
+																			for(; (yyvsp[0].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[0].string)[i]=='['||(yyvsp[0].string)[i]==']')
+																				{
+																					continue;
+																				}
+																				ind2[i-j-1] = (yyvsp[0].string)[i];
+																			}
+																			ind2[i-j-1] = '\0';
+																			AddQuadruple("=[]",var2 ,ind2 , "t");
+																			char var1[50] = "";
+																			char ind1[50] = "";
+																			for(i=0; (yyvsp[-2].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[-2].string)[i]=='[')
+																				{
+																					break;
+																				}
+																				var1[i] = (yyvsp[-2].string)[i];
+																			}
+																			var1[i] = '\0';
+																			j=i;
+																			for(; (yyvsp[-2].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[-2].string)[i]=='['||(yyvsp[-2].string)[i]==']')
+																				{
+																					continue;
+																				}
+																				ind1[i-j-1] = (yyvsp[-2].string)[i];
+																			}
+																			ind1[i-j-1] = '\0';
+																			AddQuadruple("[]=",var1 ,ind1 , "t");
+																		}
+																		else if(is2array==1)
+																		{
+																			char var[50] = "";
+																			char ind[50] = "";
+																			int i;
+																			for(i=0; (yyvsp[0].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[0].string)[i]=='[')
+																				{
+																					break;
+																				}
+																				var[i] = (yyvsp[0].string)[i];
+																			}
+																			var[i] = '\0';
+																			int j=i;
+																			for(; (yyvsp[0].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[0].string)[i]=='['||(yyvsp[0].string)[i]==']')
+																				{
+																					continue;
+																				}
+																				ind[i-j-1] = (yyvsp[0].string)[i];
+																			}
+																			ind[i-j-1] = '\0';
+																			AddQuadruple("=[]",var ,ind , (yyvsp[-2].string));
+																		}
+																		else if(is1array == 1)
+																		{
+																			char var[50] = "";
+																			char ind[50] = "";
+																			int i;
+																			for(i=0; (yyvsp[-2].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[-2].string)[i]=='[')
+																				{
+																					break;
+																				}
+																				var[i] = (yyvsp[-2].string)[i];
+																			}
+																			var[i] = '\0';
+																			int j=i;
+																			for(; (yyvsp[-2].string)[i]!='\0'; i++)
+																			{
+																				if((yyvsp[-2].string)[i]=='['||(yyvsp[-2].string)[i]==']')
+																				{
+																					continue;
+																				}
+																				ind[i-j-1] = (yyvsp[-2].string)[i];
+																			}
+																			ind[i-j-1] = '\0';
+																			AddQuadruple("[]=",var ,ind , (yyvsp[0].string));
+																		}
+																		else
+																		{
+																			strcpy(QUAD[Index].op,"=");
+																			strcpy(QUAD[Index].arg1,(yyvsp[0].string));
+																			strcpy(QUAD[Index].arg2,"");
+																			strcpy(QUAD[Index].result,(yyvsp[-2].string));
+																			QUAD[Index].scope = curr_scope;
+																			QUAD[Index].mark = 0;
+																			strcpy((yyval.string),QUAD[Index++].result);
+
+																		}
+																		// create_node("=", 0);
 																	}
-#line 2378 "y.tab.c" /* yacc.c:1646  */
+#line 2514 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 688 "icg.y" /* yacc.c:1646  */
+#line 824 "icg.y" /* yacc.c:1646  */
     {}
-#line 2384 "y.tab.c" /* yacc.c:1646  */
+#line 2520 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 689 "icg.y" /* yacc.c:1646  */
+#line 825 "icg.y" /* yacc.c:1646  */
     {}
-#line 2390 "y.tab.c" /* yacc.c:1646  */
+#line 2526 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 690 "icg.y" /* yacc.c:1646  */
+#line 826 "icg.y" /* yacc.c:1646  */
     {}
-#line 2396 "y.tab.c" /* yacc.c:1646  */
+#line 2532 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 691 "icg.y" /* yacc.c:1646  */
+#line 827 "icg.y" /* yacc.c:1646  */
     {}
-#line 2402 "y.tab.c" /* yacc.c:1646  */
+#line 2538 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 692 "icg.y" /* yacc.c:1646  */
+#line 828 "icg.y" /* yacc.c:1646  */
     {}
-#line 2408 "y.tab.c" /* yacc.c:1646  */
+#line 2544 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 693 "icg.y" /* yacc.c:1646  */
+#line 829 "icg.y" /* yacc.c:1646  */
     {}
-#line 2414 "y.tab.c" /* yacc.c:1646  */
+#line 2550 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 698 "icg.y" /* yacc.c:1646  */
+#line 834 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2420 "y.tab.c" /* yacc.c:1646  */
+#line 2556 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 699 "icg.y" /* yacc.c:1646  */
+#line 835 "icg.y" /* yacc.c:1646  */
     {}
-#line 2426 "y.tab.c" /* yacc.c:1646  */
+#line 2562 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 706 "icg.y" /* yacc.c:1646  */
+#line 842 "icg.y" /* yacc.c:1646  */
     {}
-#line 2432 "y.tab.c" /* yacc.c:1646  */
+#line 2568 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 707 "icg.y" /* yacc.c:1646  */
+#line 843 "icg.y" /* yacc.c:1646  */
     {}
-#line 2438 "y.tab.c" /* yacc.c:1646  */
+#line 2574 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 711 "icg.y" /* yacc.c:1646  */
+#line 847 "icg.y" /* yacc.c:1646  */
     {}
-#line 2444 "y.tab.c" /* yacc.c:1646  */
+#line 2580 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 712 "icg.y" /* yacc.c:1646  */
+#line 848 "icg.y" /* yacc.c:1646  */
     {}
-#line 2450 "y.tab.c" /* yacc.c:1646  */
+#line 2586 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 716 "icg.y" /* yacc.c:1646  */
+#line 852 "icg.y" /* yacc.c:1646  */
     {
 		exists((yyvsp[0].string));
 	}
-#line 2458 "y.tab.c" /* yacc.c:1646  */
+#line 2594 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 719 "icg.y" /* yacc.c:1646  */
+#line 855 "icg.y" /* yacc.c:1646  */
     {	exists((yyvsp[0].string)); }
-#line 2464 "y.tab.c" /* yacc.c:1646  */
+#line 2600 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 724 "icg.y" /* yacc.c:1646  */
+#line 860 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string)); }
-#line 2470 "y.tab.c" /* yacc.c:1646  */
+#line 2606 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 725 "icg.y" /* yacc.c:1646  */
+#line 861 "icg.y" /* yacc.c:1646  */
     {
 									char s[20] = "{";
 									strcat(s, (yyvsp[-1].string));
@@ -2485,11 +2621,11 @@ yyreduce:
 									pop_tree();
 									create_node(s, 1);
 								}
-#line 2489 "y.tab.c" /* yacc.c:1646  */
+#line 2625 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 739 "icg.y" /* yacc.c:1646  */
+#line 875 "icg.y" /* yacc.c:1646  */
     {
 										char s[20] = "{";
 										strcat(s, (yyvsp[-2].string));
@@ -2497,17 +2633,17 @@ yyreduce:
 										strcpy((yyval.string), s);
 										create_node(s, 1);
 									}
-#line 2501 "y.tab.c" /* yacc.c:1646  */
+#line 2637 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 749 "icg.y" /* yacc.c:1646  */
+#line 885 "icg.y" /* yacc.c:1646  */
     { strcpy((yyval.string), (yyvsp[0].string));}
-#line 2507 "y.tab.c" /* yacc.c:1646  */
+#line 2643 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 750 "icg.y" /* yacc.c:1646  */
+#line 886 "icg.y" /* yacc.c:1646  */
     {
 											char s[100] = "";
 											strcat(s, (yyvsp[-2].string));
@@ -2515,60 +2651,60 @@ yyreduce:
 											strcat(s, (yyvsp[0].string));
 											strcpy((yyval.string), s);
 										}
-#line 2519 "y.tab.c" /* yacc.c:1646  */
+#line 2655 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 761 "icg.y" /* yacc.c:1646  */
+#line 897 "icg.y" /* yacc.c:1646  */
     {}
-#line 2525 "y.tab.c" /* yacc.c:1646  */
+#line 2661 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 762 "icg.y" /* yacc.c:1646  */
+#line 898 "icg.y" /* yacc.c:1646  */
     {}
-#line 2531 "y.tab.c" /* yacc.c:1646  */
+#line 2667 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 763 "icg.y" /* yacc.c:1646  */
+#line 899 "icg.y" /* yacc.c:1646  */
     {}
-#line 2537 "y.tab.c" /* yacc.c:1646  */
+#line 2673 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 764 "icg.y" /* yacc.c:1646  */
+#line 900 "icg.y" /* yacc.c:1646  */
     {}
-#line 2543 "y.tab.c" /* yacc.c:1646  */
+#line 2679 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 765 "icg.y" /* yacc.c:1646  */
+#line 901 "icg.y" /* yacc.c:1646  */
     {}
-#line 2549 "y.tab.c" /* yacc.c:1646  */
+#line 2685 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 770 "icg.y" /* yacc.c:1646  */
+#line 906 "icg.y" /* yacc.c:1646  */
     {
 				opening_brackets++;
 				curr_scope = opening_brackets;
 				push_scope(curr_scope);
 		}
-#line 2559 "y.tab.c" /* yacc.c:1646  */
+#line 2695 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 775 "icg.y" /* yacc.c:1646  */
+#line 911 "icg.y" /* yacc.c:1646  */
     {
 															pop_scope();
 															curr_scope =  peep_scope();
 														}
-#line 2568 "y.tab.c" /* yacc.c:1646  */
+#line 2704 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 787 "icg.y" /* yacc.c:1646  */
+#line 923 "icg.y" /* yacc.c:1646  */
     {
 								// printf("%s %s", $1, $2);
 								char *p = strtok((yyvsp[-1].string), ",");
@@ -2579,112 +2715,177 @@ yyreduce:
 								}
 
 							}
-#line 2583 "y.tab.c" /* yacc.c:1646  */
+#line 2719 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 800 "icg.y" /* yacc.c:1646  */
+#line 936 "icg.y" /* yacc.c:1646  */
     {strcpy((yyval.string),(yyvsp[0].string));}
-#line 2589 "y.tab.c" /* yacc.c:1646  */
+#line 2725 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 801 "icg.y" /* yacc.c:1646  */
+#line 937 "icg.y" /* yacc.c:1646  */
     {
 														strcpy((yyval.string),(yyvsp[0].string));
 														strcat((yyval.string), ",");
 														strcat((yyval.string), (yyvsp[-2].string));
 													}
-#line 2599 "y.tab.c" /* yacc.c:1646  */
+#line 2735 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 809 "icg.y" /* yacc.c:1646  */
+#line 945 "icg.y" /* yacc.c:1646  */
     {strcpy((yyval.string),(yyvsp[0].string));}
-#line 2605 "y.tab.c" /* yacc.c:1646  */
+#line 2741 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 810 "icg.y" /* yacc.c:1646  */
+#line 946 "icg.y" /* yacc.c:1646  */
     {
 										create_node("=", 0);
-										char val[20];
-										strcpy(val, (yyvsp[0].string));
-										if((0<= (yyvsp[0].string)[0]-'0' && 9>=(yyvsp[0].string)[0]-'0') || (yyvsp[0].string)[0]=='\'' || (yyvsp[0].string)[0]== '"')
+										// char val[20];
+										// strcpy(val, $3);
+										// if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'' || $3[0]== '"')
+										// {
+										// 	tempval($1, val, 0, 1);
+										// 	strcpy($$,$1);
+										// }
+										// else if($3[0]=='{')
+										// {
+										// 	tempval($1, $3, 1, 0);
+										// }
+										// else
+										// {
+										// 	strcpy(val,get_val($3, curr_scope));
+										// 	tempval($1, val, 0, 1);
+										// 	strcpy($$,$1);
+										// }
+										int isarray = 0;
+										for(int i=0; (yyvsp[0].string)[i]!='\0'; i++)
 										{
-											tempval((yyvsp[-2].string), val, 0, 1);
-											strcpy((yyval.string),(yyvsp[-2].string));
+											if((yyvsp[0].string)[i]=='[')
+											{
+												isarray = 1;
+												break;
+											}
+											else
+												isarray = 0;
 										}
-										else if((yyvsp[0].string)[0]=='{')
+										if(isarray)
 										{
-											tempval((yyvsp[-2].string), (yyvsp[0].string), 1, 0);
+											char var[50] = "";
+											char ind[50] = "";
+											int i;
+											for(i=0; (yyvsp[0].string)[i]!='\0'; i++)
+											{
+												if((yyvsp[0].string)[i]=='[')
+												{
+													break;
+												}
+												var[i] = (yyvsp[0].string)[i];
+											}
+											var[i] = '\0';
+											int j=i;
+											for(; (yyvsp[0].string)[i]!='\0'; i++)
+											{
+												if((yyvsp[0].string)[i]=='['||(yyvsp[0].string)[i]==']')
+												{
+													continue;
+												}
+												ind[i-j-1] = (yyvsp[0].string)[i];
+											}
+											ind[i-j-1] = '\0';
+											AddQuadruple("=[]",var ,ind , (yyvsp[-2].string));
+										}
+										else if((yyvsp[0].string)[0] == '{')
+										{
+											int i=1;
+											int count = 0;
+											for(; (yyvsp[0].string)[i]!='\0'; i++)
+											{
+												if((yyvsp[0].string)[i]=='}')
+													break;
+												if((yyvsp[0].string)[i]==' ')
+													continue;
+												char num[50] = "";
+												int j = 0;
+												while((yyvsp[0].string)[i] !=',' && (yyvsp[0].string)[i] != '}')
+												{
+													num[j] = (yyvsp[0].string)[i];
+													j++;
+													i++;
+												}
+												num[j] ='\0';
+												char strcount[50] = "";
+												sprintf(strcount,"%d",count++);
+												AddQuadruple("[]=", (yyvsp[-2].string), strcount, num);
+											}
 										}
 										else
 										{
-											strcpy(val,get_val((yyvsp[0].string), curr_scope));
-											tempval((yyvsp[-2].string), val, 0, 1);
-											strcpy((yyval.string),(yyvsp[-2].string));
+											strcpy(QUAD[Index].op,"=");
+											strcpy(QUAD[Index].arg1,(yyvsp[0].string));
+											strcpy(QUAD[Index].arg2,"");
+											strcpy(QUAD[Index].result,(yyvsp[-2].string));
+											QUAD[Index].scope = curr_scope;
+											QUAD[Index].mark = 0;
+											strcpy((yyval.string),QUAD[Index++].result);
 										}
-										strcpy(QUAD[Index].op,"=");
-										strcpy(QUAD[Index].arg1,(yyvsp[0].string));
-										strcpy(QUAD[Index].arg2,"");
-										strcpy(QUAD[Index].result,(yyvsp[-2].string));
-										QUAD[Index].scope = curr_scope;
-										strcpy((yyval.string),QUAD[Index++].result);
 									}
-#line 2636 "y.tab.c" /* yacc.c:1646  */
+#line 2837 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 839 "icg.y" /* yacc.c:1646  */
+#line 1040 "icg.y" /* yacc.c:1646  */
     {strcpy((yyval.string),(yyvsp[0].string));}
-#line 2642 "y.tab.c" /* yacc.c:1646  */
+#line 2843 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 840 "icg.y" /* yacc.c:1646  */
+#line 1041 "icg.y" /* yacc.c:1646  */
     {}
-#line 2648 "y.tab.c" /* yacc.c:1646  */
+#line 2849 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 841 "icg.y" /* yacc.c:1646  */
+#line 1042 "icg.y" /* yacc.c:1646  */
     {}
-#line 2654 "y.tab.c" /* yacc.c:1646  */
+#line 2855 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 842 "icg.y" /* yacc.c:1646  */
+#line 1043 "icg.y" /* yacc.c:1646  */
     {strcpy((yyval.string),(yyvsp[0].string));}
-#line 2660 "y.tab.c" /* yacc.c:1646  */
+#line 2861 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 843 "icg.y" /* yacc.c:1646  */
+#line 1044 "icg.y" /* yacc.c:1646  */
     {}
-#line 2666 "y.tab.c" /* yacc.c:1646  */
+#line 2867 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 844 "icg.y" /* yacc.c:1646  */
+#line 1045 "icg.y" /* yacc.c:1646  */
     {}
-#line 2672 "y.tab.c" /* yacc.c:1646  */
+#line 2873 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 845 "icg.y" /* yacc.c:1646  */
+#line 1046 "icg.y" /* yacc.c:1646  */
     {}
-#line 2678 "y.tab.c" /* yacc.c:1646  */
+#line 2879 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 849 "icg.y" /* yacc.c:1646  */
+#line 1050 "icg.y" /* yacc.c:1646  */
     { create_node((yyvsp[0].string), 1); strcpy((yyval.string),(yyvsp[0].string));}
-#line 2684 "y.tab.c" /* yacc.c:1646  */
+#line 2885 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 851 "icg.y" /* yacc.c:1646  */
+#line 1052 "icg.y" /* yacc.c:1646  */
     {
 										Node * n= pop_tree();
 										char s[30] = "";
@@ -2694,144 +2895,150 @@ yyreduce:
 										strcat(s, "]");
 										create_node(s, 1);
 										tempval((yyvsp[-3].string), "{0}", 1, atoi((yyvsp[-1].string))); strcpy((yyval.string), (yyvsp[-3].string)); }
-#line 2698 "y.tab.c" /* yacc.c:1646  */
+#line 2899 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 860 "icg.y" /* yacc.c:1646  */
+#line 1061 "icg.y" /* yacc.c:1646  */
     {}
-#line 2704 "y.tab.c" /* yacc.c:1646  */
+#line 2905 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 861 "icg.y" /* yacc.c:1646  */
+#line 1062 "icg.y" /* yacc.c:1646  */
     {}
-#line 2710 "y.tab.c" /* yacc.c:1646  */
+#line 2911 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 862 "icg.y" /* yacc.c:1646  */
+#line 1063 "icg.y" /* yacc.c:1646  */
     {strcpy((yyval.string), (yyvsp[-2].string)); }
-#line 2716 "y.tab.c" /* yacc.c:1646  */
+#line 2917 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 866 "icg.y" /* yacc.c:1646  */
+#line 1067 "icg.y" /* yacc.c:1646  */
     {}
-#line 2722 "y.tab.c" /* yacc.c:1646  */
+#line 2923 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 867 "icg.y" /* yacc.c:1646  */
+#line 1068 "icg.y" /* yacc.c:1646  */
     { create_node("stmt", 0); }
-#line 2728 "y.tab.c" /* yacc.c:1646  */
+#line 2929 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 871 "icg.y" /* yacc.c:1646  */
+#line 1072 "icg.y" /* yacc.c:1646  */
     {}
-#line 2734 "y.tab.c" /* yacc.c:1646  */
+#line 2935 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 872 "icg.y" /* yacc.c:1646  */
+#line 1073 "icg.y" /* yacc.c:1646  */
     {}
-#line 2740 "y.tab.c" /* yacc.c:1646  */
+#line 2941 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 877 "icg.y" /* yacc.c:1646  */
+#line 1078 "icg.y" /* yacc.c:1646  */
     {
 													create_node("if", 0);
 													AddQuadruple("Label" ,"iffalse", "onlyif", "");
 												 }
-#line 2749 "y.tab.c" /* yacc.c:1646  */
+#line 2950 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 104:
-#line 882 "icg.y" /* yacc.c:1646  */
+#line 1083 "icg.y" /* yacc.c:1646  */
     {
 														AddQuadruple("goto","ifdone","","");
 														AddQuadruple("Label","iffalse","","");
 													 }
-#line 2758 "y.tab.c" /* yacc.c:1646  */
+#line 2959 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 105:
-#line 887 "icg.y" /* yacc.c:1646  */
+#line 1088 "icg.y" /* yacc.c:1646  */
     {
 														AddQuadruple("Label","ifdone","","");
 														create_node("else", 0);
 														create_node("if", 0);
 													}
-#line 2768 "y.tab.c" /* yacc.c:1646  */
+#line 2969 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 106:
-#line 895 "icg.y" /* yacc.c:1646  */
+#line 1096 "icg.y" /* yacc.c:1646  */
     {
 						AddQuadruple("if", "", "iftrue", "");
 						AddQuadruple("goto","iffalse","","");
 						AddQuadruple("Label","iftrue","","");
 					}
-#line 2778 "y.tab.c" /* yacc.c:1646  */
+#line 2979 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 107:
-#line 904 "icg.y" /* yacc.c:1646  */
+#line 1105 "icg.y" /* yacc.c:1646  */
     {
 				AddQuadruple("Label","whilecond","","");
 			}
-#line 2786 "y.tab.c" /* yacc.c:1646  */
+#line 2987 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 108:
-#line 907 "icg.y" /* yacc.c:1646  */
+#line 1108 "icg.y" /* yacc.c:1646  */
     {insideloop = 1; }
-#line 2792 "y.tab.c" /* yacc.c:1646  */
+#line 2993 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 109:
-#line 907 "icg.y" /* yacc.c:1646  */
+#line 1108 "icg.y" /* yacc.c:1646  */
     {
 																		AddQuadruple("goto","whilecond","","");
 																		AddQuadruple("Label","whilefalse","","");
 																		insideloop = 0;
 																		create_node("while", 0);
 																	}
-#line 2803 "y.tab.c" /* yacc.c:1646  */
+#line 3004 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 110:
-#line 914 "icg.y" /* yacc.c:1646  */
-    {insideloop = 1; }
-#line 2809 "y.tab.c" /* yacc.c:1646  */
+#line 1115 "icg.y" /* yacc.c:1646  */
+    {
+			AddQuadruple("Label","dotrue", "","");
+			insideloop = 1;
+		  }
+#line 3013 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 111:
-#line 914 "icg.y" /* yacc.c:1646  */
-    {insideloop = 0; create_node("do-while", 0);}
-#line 2815 "y.tab.c" /* yacc.c:1646  */
+#line 1119 "icg.y" /* yacc.c:1646  */
+    {
+			  						insideloop = 0;
+									AddQuadruple("if","", "dotrue","");
+								}
+#line 3022 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 112:
-#line 918 "icg.y" /* yacc.c:1646  */
+#line 1126 "icg.y" /* yacc.c:1646  */
     {
 						AddQuadruple("if", "", "whiletrue", "");
 						AddQuadruple("goto","whilefalse","","");
 						AddQuadruple("Label","whiletrue","","");
 					}
-#line 2825 "y.tab.c" /* yacc.c:1646  */
+#line 3032 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 113:
-#line 926 "icg.y" /* yacc.c:1646  */
+#line 1134 "icg.y" /* yacc.c:1646  */
     {}
-#line 2831 "y.tab.c" /* yacc.c:1646  */
+#line 3038 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 114:
-#line 927 "icg.y" /* yacc.c:1646  */
+#line 1135 "icg.y" /* yacc.c:1646  */
     {
 						if(!insideloop)
 						{
@@ -2839,85 +3046,85 @@ yyreduce:
 							exit(0);
 						}
 					}
-#line 2843 "y.tab.c" /* yacc.c:1646  */
+#line 3050 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 115:
-#line 934 "icg.y" /* yacc.c:1646  */
+#line 1142 "icg.y" /* yacc.c:1646  */
     { create_node("return",1);}
-#line 2849 "y.tab.c" /* yacc.c:1646  */
+#line 3056 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 116:
-#line 935 "icg.y" /* yacc.c:1646  */
+#line 1143 "icg.y" /* yacc.c:1646  */
     { char s[20] = "return ";
 							  strcat(s, (yyvsp[-1].string));
 							  modify_top(s);}
-#line 2857 "y.tab.c" /* yacc.c:1646  */
+#line 3064 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 117:
-#line 941 "icg.y" /* yacc.c:1646  */
+#line 1149 "icg.y" /* yacc.c:1646  */
     {}
-#line 2863 "y.tab.c" /* yacc.c:1646  */
+#line 3070 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 118:
-#line 942 "icg.y" /* yacc.c:1646  */
+#line 1150 "icg.y" /* yacc.c:1646  */
     {}
-#line 2869 "y.tab.c" /* yacc.c:1646  */
+#line 3076 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 119:
-#line 946 "icg.y" /* yacc.c:1646  */
+#line 1154 "icg.y" /* yacc.c:1646  */
     {}
-#line 2875 "y.tab.c" /* yacc.c:1646  */
+#line 3082 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 120:
-#line 947 "icg.y" /* yacc.c:1646  */
+#line 1155 "icg.y" /* yacc.c:1646  */
     {}
-#line 2881 "y.tab.c" /* yacc.c:1646  */
+#line 3088 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 121:
-#line 951 "icg.y" /* yacc.c:1646  */
+#line 1159 "icg.y" /* yacc.c:1646  */
     {}
-#line 2887 "y.tab.c" /* yacc.c:1646  */
+#line 3094 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 122:
-#line 952 "icg.y" /* yacc.c:1646  */
+#line 1160 "icg.y" /* yacc.c:1646  */
     {}
-#line 2893 "y.tab.c" /* yacc.c:1646  */
+#line 3100 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 123:
-#line 956 "icg.y" /* yacc.c:1646  */
+#line 1164 "icg.y" /* yacc.c:1646  */
     {}
-#line 2899 "y.tab.c" /* yacc.c:1646  */
+#line 3106 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 124:
-#line 956 "icg.y" /* yacc.c:1646  */
+#line 1164 "icg.y" /* yacc.c:1646  */
     { lookup((yyvsp[-2].string), (yyvsp[-3].string), "function"); }
-#line 2905 "y.tab.c" /* yacc.c:1646  */
+#line 3112 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 125:
-#line 957 "icg.y" /* yacc.c:1646  */
+#line 1165 "icg.y" /* yacc.c:1646  */
     {}
-#line 2911 "y.tab.c" /* yacc.c:1646  */
+#line 3118 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 126:
-#line 958 "icg.y" /* yacc.c:1646  */
+#line 1166 "icg.y" /* yacc.c:1646  */
     {}
-#line 2917 "y.tab.c" /* yacc.c:1646  */
+#line 3124 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2921 "y.tab.c" /* yacc.c:1646  */
+#line 3128 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3145,7 +3352,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 961 "icg.y" /* yacc.c:1906  */
+#line 1169 "icg.y" /* yacc.c:1906  */
 
 
 int scopeinstack(int scope)
@@ -3247,54 +3454,6 @@ void showTrunks(Trunk *p)
 	printf("%s",p->str);
 }
 
-// selection_statement
-// 	: IF '(' expression ')' M compound_statement {
-// 													create_node("if", 0);
-// 													AddQuadruple("Label" ,"iffalse", "onlyif", "");
-// 												 }
-//
-// 	| IF '(' expression ')' M compound_statement ELSE {
-// 														AddQuadruple("goto","ifdone","","");
-// 														AddQuadruple("Label","iffalse","","");
-// 													 }
-// 													 compound_statement
-// 													 {
-// 														AddQuadruple("Label","ifdone","","");
-// 														create_node("else", 0);
-// 														create_node("if", 0);
-// 													}
-// 	;
-//
-// M
-// 	: /* epsilon */ {
-// 						AddQuadruple("if", "", "iftrue", "");
-// 						AddQuadruple("goto","iffalse","","");
-// 						AddQuadruple("Label","iftrue","","");
-// 					}
-// 	;
-//
-//
-// iteration_statement
-// 	: WHILE {
-// 				AddQuadruple("Label","whilecond","","");
-// 			}
-// 	'(' expression ')' whileM {insideloop = 1; } compound_statement {
-// 																		AddQuadruple("goto","whilecond","","");
-// 																		AddQuadruple("Label","whilefalse","","");
-// 																		insideloop = 0;
-// 																		create_node("while", 0);
-// 																	}
-//
-// 	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
-// 	;
-//
-// whileM
-// 	: /* epsilon */ {
-// 						AddQuadruple("if", "", "whiletrue", "");
-// 						AddQuadruple("goto","whilefalse","","");
-// 						AddQuadruple("Label","whiletrue","","");
-// 					}
-// 	;
 void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 {
 	strcpy(QUAD[Index].op,op);
@@ -3312,6 +3471,13 @@ void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 		else if(strcmp(arg2, "whiletrue")==0)
 		{
 			whileStack[whileTop++] = L;
+		}
+		else if(strcmp(arg2, "dotrue")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", doStack[doTop-1]);
+			strcpy(QUAD[Index++].arg2, "");
+			doTop = doTop - 1;
+			return;
 		}
 		strcpy(QUAD[Index].arg2,"");
 		sprintf(QUAD[Index++].result,"L%d",L++);
@@ -3365,8 +3531,46 @@ void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 			sprintf(QUAD[Index].result,"L%d", whileStack[whileTop-1]);
 			whileTop = whileTop -3;
 		}
+		else if(strcmp(arg1, "dotrue")==0)
+		{
+			doStack[doTop++] = L;
+			sprintf(QUAD[Index].result,"L%d", L++);
+		}
 		strcpy(QUAD[Index].arg1,"");
 		strcpy(QUAD[Index++].arg2,"");
+	}
+	else if(strcmp(op, "=[]")==0)
+	{
+		if(strcmp(result, "t")!=0)
+		{
+			char res[50];
+			strcpy(res, result);
+			sprintf(QUAD[Index].result,"t%d",tIndex++);
+			lookup(QUAD[Index++].result, "int", "temporary");
+			strcpy(QUAD[Index].op,"=");
+			strcpy(QUAD[Index].arg1,QUAD[Index-1].result);
+			strcpy(QUAD[Index].arg2,"");
+			strcpy(QUAD[Index].result,res);
+			QUAD[Index].scope = curr_scope;
+			QUAD[Index].mark = 0;
+			strcpy(result,QUAD[Index++].result);
+		}
+		else
+		{
+			sprintf(QUAD[Index].result,"t%d",tIndex++);
+			lookup(QUAD[Index++].result, "int", "temporary");
+		}
+	}
+	else if(strcmp(op, "[]=")==0)
+	{
+		if(strcmp(result, "t")!=0)
+			strcpy(QUAD[Index++].result,result);
+		else
+		{
+			strcpy(QUAD[Index++].result, QUAD[Index-1].result);
+			// lookup(QUAD[Index].result, "int", "temporary");
+			// strcpy(result,QUAD[Index++].result);
+		}
 	}
 	else
 	{
@@ -4303,6 +4507,7 @@ int main()
 	display(st);
 	//Display IC
 	printICG();
+	printf("\nAfter optimization: \n");
 	optimizeICG();
 
 	printICG();

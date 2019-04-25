@@ -16,6 +16,8 @@ int whileStack[100];
 int whileTop = 0;
 int ifStack[100];
 int ifTop = 0;
+int doStack[100];
+int doTop = 0;
 
 typedef struct Node{
 	struct Node *left;
@@ -180,8 +182,8 @@ primary_expression
 postfix_expression
 	: primary_expression	{ strcpy($$, $1); }
 	| postfix_expression '[' expression ']'	{
-												pop_tree();
-												pop_tree();
+												/* pop_tree();
+												pop_tree(); */
 												char s[30];
 												strcpy(s, $1);
 												strcat(s, "[");
@@ -196,7 +198,7 @@ postfix_expression
 	| postfix_expression '.' IDENTIFIER		{ exists($3);}
 	| postfix_expression INC_OP		{
 
-		int d1 = $1[0] - '0';
+		/* int d1 = $1[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -212,12 +214,14 @@ postfix_expression
 		}
 
 		create_node("1",1);
-		create_node("+", 0);
+		create_node("+", 0); */
+
+		AddQuadruple("+", $1, "1", $$);
 
 	}
 	| postfix_expression DEC_OP		{
 
-		int d1 = $1[0] - '0';
+		/* int d1 = $1[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -233,7 +237,9 @@ postfix_expression
 		}
 
 		create_node("1",1);
-		create_node("-", 0);
+		create_node("-", 0); */
+
+		AddQuadruple("-", $1, "1", $$);
 
 	}
 	;
@@ -247,7 +253,7 @@ unary_expression
 	: postfix_expression	{ strcpy($$, $1); }
 	| INC_OP unary_expression	{
 
-		int d1 = $2[0] - '0';
+		/* int d1 = $2[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -263,12 +269,13 @@ unary_expression
 		}
 
 		create_node("1",1);
-		create_node("+", 0);
+		create_node("+", 0); */
+		AddQuadruple("+", $2, "1", $$);
 
 	}
 	| DEC_OP unary_expression	{
 
-		int d1 = $2[0] - '0';
+		/* int d1 = $2[0] - '0';
 		if(d1>=0 && d1 <= 9)
 		{
 			printf("\n%*s\n%*s   <--- invalid operation \n", column, "^", column, wrong_symbol);
@@ -283,7 +290,8 @@ unary_expression
 			addval($2, str, curr_scope);
 		}
 		create_node("1",1);
-		create_node("-", 0);
+		create_node("-", 0); */
+		AddQuadruple("-", $2, "1", $$);
 
 	}
 	| unary_operator unary_expression	{}
@@ -303,7 +311,7 @@ unary_operator
 multiplicative_expression
 	: unary_expression	{ strcpy($$, $1); }
 	| multiplicative_expression '*' unary_expression	{
-															create_node("*", 0);
+															/* create_node("*", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -325,11 +333,11 @@ multiplicative_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) * atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("*" , $1, $3, $$);
 														}
 	| multiplicative_expression '/' unary_expression	{
-															create_node("/", 0);
+															/* create_node("/", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -351,12 +359,12 @@ multiplicative_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) / atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("/" , $1, $3, $$);
 
 														}
 	| multiplicative_expression '%' unary_expression	{
-															create_node("%", 0);
+															/* create_node("%", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -378,7 +386,7 @@ multiplicative_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) % atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("%" , $1, $3, $$);
 														}
 	;
@@ -386,7 +394,7 @@ multiplicative_expression
 additive_expression
 	: multiplicative_expression	{ strcpy($$, $1); }
 	| additive_expression '+' multiplicative_expression		{
-															create_node("+", 0);
+															/* create_node("+", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -408,11 +416,11 @@ additive_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) + atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("+" , $1, $3, $$);
 														}
 	| additive_expression '-' multiplicative_expression		{
-															create_node("-", 0);
+															/* create_node("-", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -434,7 +442,7 @@ additive_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) - atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("-" , $1, $3, $$);
 														}
 	;
@@ -443,8 +451,8 @@ relational_expression
 	: additive_expression	{ strcpy($$, $1); }
 	| relational_expression '<' additive_expression		{
 
-															create_node("<", 0);
-															int d1 = $1[0] - '0';
+															/* create_node("<", 0); */
+															/* int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
@@ -465,11 +473,11 @@ relational_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) < atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 															AddQuadruple("<",$1,$3,$$);
 														}
 	| relational_expression '>' additive_expression		{
-															create_node(">", 0);
+															/* create_node(">", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -491,12 +499,12 @@ relational_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) > atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 
 															AddQuadruple(">",$1,$3,$$);
 														}
 	| relational_expression LE_OP additive_expression	{
-															create_node("<=", 0);
+															/* create_node("<=", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -518,7 +526,7 @@ relational_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) <= atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 
 															AddQuadruple($2,$1,$3,$$);
 														}
@@ -553,8 +561,8 @@ relational_expression
 equality_expression
 	: relational_expression	{ strcpy($$, $1); }
 	| equality_expression EQ_OP relational_expression	{
-															create_node("==", 0);
-															int d1 = $1[0] - '0';
+															/* create_node("==", 0); */
+															/* int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
 															{
@@ -575,11 +583,11 @@ equality_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) == atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 																AddQuadruple($2,$1,$3,$$);
 														}
 	| equality_expression NE_OP relational_expression	{
-															create_node("!=", 0);
+															/* create_node("!=", 0);
 															int d1 = $1[0] - '0';
 															int d2 = $3[0] - '0';
 															if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -601,7 +609,7 @@ equality_expression
 															{
 																int s = atoi(get_val($1, curr_scope)) != atoi(get_val($3, curr_scope));
 																snprintf($$, 10, "%d", s);
-															}
+															} */
 																AddQuadruple($2,$1,$3,$$);
 														}
 	;
@@ -609,7 +617,7 @@ equality_expression
 logical_and_expression
 	: equality_expression	{ strcpy($$, $1); }
 	| logical_and_expression AND_OP equality_expression		{
-																create_node("&&", 0);
+																/* create_node("&&", 0);
 																int d1 = $1[0] - '0';
 																int d2 = $3[0] - '0';
 																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -631,14 +639,15 @@ logical_and_expression
 																{
 																	int s = atoi(get_val($1, curr_scope)) && atoi(get_val($3, curr_scope));
 																	snprintf($$, 10, "%d", s);
-																}
+																} */
+																AddQuadruple($2,$1,$3,$$);
 															}
 	;
 
 logical_or_expression
 	: logical_and_expression	{ strcpy($$, $1); }
 	| logical_or_expression OR_OP logical_and_expression	{
-																create_node("||", 0);
+																/* create_node("||", 0);
 																int d1 = $1[0] - '0';
 																int d2 = $3[0] - '0';
 																if(d1>=0 && d1 <= 9 && d2>=0 && d2<=9)
@@ -660,7 +669,8 @@ logical_or_expression
 																{
 																	int s = atoi(get_val($1, curr_scope)) || atoi(get_val($3, curr_scope));
 																	snprintf($$, 10, "%d", s);
-																}
+																} */
+																AddQuadruple($2,$1,$3,$$);
 															}
 	;
 
@@ -673,14 +683,140 @@ assignment_expression
 	: conditional_expression	{ strcpy($$, $1); }
 	| unary_expression assignment_operator assignment_expression	{
 																		// addval($1, $3, curr_scope);
-																		strcpy(QUAD[Index].op,"=");
-																		strcpy(QUAD[Index].arg1,$3);
-																		strcpy(QUAD[Index].arg2,"");
-																		strcpy(QUAD[Index].result,$1);
-																		QUAD[Index].scope = curr_scope;
-																		strcpy($$,QUAD[Index++].result);
+																		int is1array = 0, is2array = 0;
+																		for(int i=0; $3[i]!='\0'; i++)
+																		{
+																			if($3[i]=='[')
+																			{
+																				is2array = 1;
+																				break;
 
-																		create_node("=", 0);
+																			}
+																			else
+																				is2array = 0;
+																		}
+																		for(int i=0; $1[i]!='\0'; i++)
+																		{
+																			if($1[i]=='[')
+																			{
+																				is1array = 1;
+																				break;
+																			}
+																			else
+																				is1array = 0;
+																		}
+																		if(is1array && is2array)
+																		{
+																			char var2[50] = "";
+																			char ind2[50] = "";
+																			int i;
+																			for(i=0; $3[i]!='\0'; i++)
+																			{
+																				if($3[i]=='[')
+																				{
+																					break;
+																				}
+																				var2[i] = $3[i];
+																			}
+																			var2[i] = '\0';
+																			int j=i;
+																			for(; $3[i]!='\0'; i++)
+																			{
+																				if($3[i]=='['||$3[i]==']')
+																				{
+																					continue;
+																				}
+																				ind2[i-j-1] = $3[i];
+																			}
+																			ind2[i-j-1] = '\0';
+																			AddQuadruple("=[]",var2 ,ind2 , "t");
+																			char var1[50] = "";
+																			char ind1[50] = "";
+																			for(i=0; $1[i]!='\0'; i++)
+																			{
+																				if($1[i]=='[')
+																				{
+																					break;
+																				}
+																				var1[i] = $1[i];
+																			}
+																			var1[i] = '\0';
+																			j=i;
+																			for(; $1[i]!='\0'; i++)
+																			{
+																				if($1[i]=='['||$1[i]==']')
+																				{
+																					continue;
+																				}
+																				ind1[i-j-1] = $1[i];
+																			}
+																			ind1[i-j-1] = '\0';
+																			AddQuadruple("[]=",var1 ,ind1 , "t");
+																		}
+																		else if(is2array==1)
+																		{
+																			char var[50] = "";
+																			char ind[50] = "";
+																			int i;
+																			for(i=0; $3[i]!='\0'; i++)
+																			{
+																				if($3[i]=='[')
+																				{
+																					break;
+																				}
+																				var[i] = $3[i];
+																			}
+																			var[i] = '\0';
+																			int j=i;
+																			for(; $3[i]!='\0'; i++)
+																			{
+																				if($3[i]=='['||$3[i]==']')
+																				{
+																					continue;
+																				}
+																				ind[i-j-1] = $3[i];
+																			}
+																			ind[i-j-1] = '\0';
+																			AddQuadruple("=[]",var ,ind , $1);
+																		}
+																		else if(is1array == 1)
+																		{
+																			char var[50] = "";
+																			char ind[50] = "";
+																			int i;
+																			for(i=0; $1[i]!='\0'; i++)
+																			{
+																				if($1[i]=='[')
+																				{
+																					break;
+																				}
+																				var[i] = $1[i];
+																			}
+																			var[i] = '\0';
+																			int j=i;
+																			for(; $1[i]!='\0'; i++)
+																			{
+																				if($1[i]=='['||$1[i]==']')
+																				{
+																					continue;
+																				}
+																				ind[i-j-1] = $1[i];
+																			}
+																			ind[i-j-1] = '\0';
+																			AddQuadruple("[]=",var ,ind , $3);
+																		}
+																		else
+																		{
+																			strcpy(QUAD[Index].op,"=");
+																			strcpy(QUAD[Index].arg1,$3);
+																			strcpy(QUAD[Index].arg2,"");
+																			strcpy(QUAD[Index].result,$1);
+																			QUAD[Index].scope = curr_scope;
+																			QUAD[Index].mark = 0;
+																			strcpy($$,QUAD[Index++].result);
+
+																		}
+																		// create_node("=", 0);
 																	}
 	;
 
@@ -809,29 +945,94 @@ init_declarator
 	: declarator 	{strcpy($$,$1);}
 	| declarator '=' initializer	{
 										create_node("=", 0);
-										char val[20];
-										strcpy(val, $3);
-										if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'' || $3[0]== '"')
+										// char val[20];
+										// strcpy(val, $3);
+										// if((0<= $3[0]-'0' && 9>=$3[0]-'0') || $3[0]=='\'' || $3[0]== '"')
+										// {
+										// 	tempval($1, val, 0, 1);
+										// 	strcpy($$,$1);
+										// }
+										// else if($3[0]=='{')
+										// {
+										// 	tempval($1, $3, 1, 0);
+										// }
+										// else
+										// {
+										// 	strcpy(val,get_val($3, curr_scope));
+										// 	tempval($1, val, 0, 1);
+										// 	strcpy($$,$1);
+										// }
+										int isarray = 0;
+										for(int i=0; $3[i]!='\0'; i++)
 										{
-											tempval($1, val, 0, 1);
-											strcpy($$,$1);
+											if($3[i]=='[')
+											{
+												isarray = 1;
+												break;
+											}
+											else
+												isarray = 0;
 										}
-										else if($3[0]=='{')
+										if(isarray)
 										{
-											tempval($1, $3, 1, 0);
+											char var[50] = "";
+											char ind[50] = "";
+											int i;
+											for(i=0; $3[i]!='\0'; i++)
+											{
+												if($3[i]=='[')
+												{
+													break;
+												}
+												var[i] = $3[i];
+											}
+											var[i] = '\0';
+											int j=i;
+											for(; $3[i]!='\0'; i++)
+											{
+												if($3[i]=='['||$3[i]==']')
+												{
+													continue;
+												}
+												ind[i-j-1] = $3[i];
+											}
+											ind[i-j-1] = '\0';
+											AddQuadruple("=[]",var ,ind , $1);
+										}
+										else if($3[0] == '{')
+										{
+											int i=1;
+											int count = 0;
+											for(; $3[i]!='\0'; i++)
+											{
+												if($3[i]=='}')
+													break;
+												if($3[i]==' ')
+													continue;
+												char num[50] = "";
+												int j = 0;
+												while($3[i] !=',' && $3[i] != '}')
+												{
+													num[j] = $3[i];
+													j++;
+													i++;
+												}
+												num[j] ='\0';
+												char strcount[50] = "";
+												sprintf(strcount,"%d",count++);
+												AddQuadruple("[]=", $1, strcount, num);
+											}
 										}
 										else
 										{
-											strcpy(val,get_val($3, curr_scope));
-											tempval($1, val, 0, 1);
-											strcpy($$,$1);
+											strcpy(QUAD[Index].op,"=");
+											strcpy(QUAD[Index].arg1,$3);
+											strcpy(QUAD[Index].arg2,"");
+											strcpy(QUAD[Index].result,$1);
+											QUAD[Index].scope = curr_scope;
+											QUAD[Index].mark = 0;
+											strcpy($$,QUAD[Index++].result);
 										}
-										strcpy(QUAD[Index].op,"=");
-										strcpy(QUAD[Index].arg1,$3);
-										strcpy(QUAD[Index].arg2,"");
-										strcpy(QUAD[Index].result,$1);
-										QUAD[Index].scope = curr_scope;
-										strcpy($$,QUAD[Index++].result);
 									}
 	;
 
@@ -911,7 +1112,14 @@ iteration_statement
 																		create_node("while", 0);
 																	}
 
-	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
+	| DO  {
+			AddQuadruple("Label","dotrue", "","");
+			insideloop = 1;
+		  }
+		  compound_statement WHILE '(' expression ')' ';' {
+			  						insideloop = 0;
+									AddQuadruple("if","", "dotrue","");
+								}
 	;
 
 whileM
@@ -1059,54 +1267,6 @@ void showTrunks(Trunk *p)
 	printf("%s",p->str);
 }
 
-// selection_statement
-// 	: IF '(' expression ')' M compound_statement {
-// 													create_node("if", 0);
-// 													AddQuadruple("Label" ,"iffalse", "onlyif", "");
-// 												 }
-//
-// 	| IF '(' expression ')' M compound_statement ELSE {
-// 														AddQuadruple("goto","ifdone","","");
-// 														AddQuadruple("Label","iffalse","","");
-// 													 }
-// 													 compound_statement
-// 													 {
-// 														AddQuadruple("Label","ifdone","","");
-// 														create_node("else", 0);
-// 														create_node("if", 0);
-// 													}
-// 	;
-//
-// M
-// 	: /* epsilon */ {
-// 						AddQuadruple("if", "", "iftrue", "");
-// 						AddQuadruple("goto","iffalse","","");
-// 						AddQuadruple("Label","iftrue","","");
-// 					}
-// 	;
-//
-//
-// iteration_statement
-// 	: WHILE {
-// 				AddQuadruple("Label","whilecond","","");
-// 			}
-// 	'(' expression ')' whileM {insideloop = 1; } compound_statement {
-// 																		AddQuadruple("goto","whilecond","","");
-// 																		AddQuadruple("Label","whilefalse","","");
-// 																		insideloop = 0;
-// 																		create_node("while", 0);
-// 																	}
-//
-// 	| DO  {insideloop = 1; }  compound_statement WHILE '(' expression ')' ';' {insideloop = 0; create_node("do-while", 0);}
-// 	;
-//
-// whileM
-// 	: /* epsilon */ {
-// 						AddQuadruple("if", "", "whiletrue", "");
-// 						AddQuadruple("goto","whilefalse","","");
-// 						AddQuadruple("Label","whiletrue","","");
-// 					}
-// 	;
 void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 {
 	strcpy(QUAD[Index].op,op);
@@ -1124,6 +1284,13 @@ void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 		else if(strcmp(arg2, "whiletrue")==0)
 		{
 			whileStack[whileTop++] = L;
+		}
+		else if(strcmp(arg2, "dotrue")==0)
+		{
+			sprintf(QUAD[Index].result,"L%d", doStack[doTop-1]);
+			strcpy(QUAD[Index++].arg2, "");
+			doTop = doTop - 1;
+			return;
 		}
 		strcpy(QUAD[Index].arg2,"");
 		sprintf(QUAD[Index++].result,"L%d",L++);
@@ -1177,8 +1344,46 @@ void AddQuadruple(char op[5],char arg1[10],char arg2[10],char result[10])
 			sprintf(QUAD[Index].result,"L%d", whileStack[whileTop-1]);
 			whileTop = whileTop -3;
 		}
+		else if(strcmp(arg1, "dotrue")==0)
+		{
+			doStack[doTop++] = L;
+			sprintf(QUAD[Index].result,"L%d", L++);
+		}
 		strcpy(QUAD[Index].arg1,"");
 		strcpy(QUAD[Index++].arg2,"");
+	}
+	else if(strcmp(op, "=[]")==0)
+	{
+		if(strcmp(result, "t")!=0)
+		{
+			char res[50];
+			strcpy(res, result);
+			sprintf(QUAD[Index].result,"t%d",tIndex++);
+			lookup(QUAD[Index++].result, "int", "temporary");
+			strcpy(QUAD[Index].op,"=");
+			strcpy(QUAD[Index].arg1,QUAD[Index-1].result);
+			strcpy(QUAD[Index].arg2,"");
+			strcpy(QUAD[Index].result,res);
+			QUAD[Index].scope = curr_scope;
+			QUAD[Index].mark = 0;
+			strcpy(result,QUAD[Index++].result);
+		}
+		else
+		{
+			sprintf(QUAD[Index].result,"t%d",tIndex++);
+			lookup(QUAD[Index++].result, "int", "temporary");
+		}
+	}
+	else if(strcmp(op, "[]=")==0)
+	{
+		if(strcmp(result, "t")!=0)
+			strcpy(QUAD[Index++].result,result);
+		else
+		{
+			strcpy(QUAD[Index++].result, QUAD[Index-1].result);
+			// lookup(QUAD[Index].result, "int", "temporary");
+			// strcpy(result,QUAD[Index++].result);
+		}
 	}
 	else
 	{
@@ -2115,6 +2320,7 @@ int main()
 	display(st);
 	//Display IC
 	printICG();
+	printf("\nAfter optimization: \n");
 	optimizeICG();
 
 	printICG();
